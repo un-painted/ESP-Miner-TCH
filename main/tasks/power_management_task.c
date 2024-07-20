@@ -38,8 +38,8 @@ static float _fbound(float value, float lower_bound, float upper_bound)
     return value;
 }
 
-// Set the fan speed between 20% min and 100% max based on chip temperature as input.
-// The fan speed increases from 20% to 100% proportionally to the temperature increase from 50 and THROTTLE_TEMP
+// Set the fan speed between 30% min and 100% max based on chip temperature as input.
+// The fan speed increases from 35% to 100% proportionally to the temperature increase from 50 and THROTTLE_TEMP
 static double automatic_fan_speed(float chip_temp, GlobalState * GLOBAL_STATE)
 {
     double result = 0.0;
@@ -119,6 +119,20 @@ void POWER_MANAGEMENT_task(void * pvParameters)
         switch (GLOBAL_STATE->device_model) {
             case DEVICE_MAX:
             case DEVICE_ULTRA:
+                if (GLOBAL_STATE->board_version == 207) {
+                    power_management->voltage = TPS546_get_vin() * 1000;
+                    power_management->current = TPS546_get_iout() * 1000;
+                    // calculate regulator power (in milliwatts)
+                    power_management->power = (TPS546_get_vout() * power_management->current) / 1000;
+				} else if (INA260_installed() == true) {
+                    power_management->voltage = INA260_read_voltage();
+                    power_management->current = INA260_read_current();
+                    power_management->power = INA260_read_power() / 1000;
+				}
+            
+                power_management->fan_rpm = EMC2101_get_fan_speed();
+            
+                break;
             case DEVICE_SUPRA:
 				if (GLOBAL_STATE->board_version == 402) {
                     power_management->voltage = TPS546_get_vin() * 1000;
@@ -167,8 +181,15 @@ void POWER_MANAGEMENT_task(void * pvParameters)
             switch (GLOBAL_STATE->device_model) {
                 case DEVICE_MAX:
                 case DEVICE_ULTRA:
+                    if (GLOBAL_STATE->board_version == 207) {
+                        power_management->chip_temp_avg = EMC2101_get_external_temp();
+						power_management->vr_temp = (float)TPS546_get_temperature();
+					} else {
+                        power_management->chip_temp_avg = EMC2101_get_internal_temp() + 5;
+    					power_management->vr_temp = 0.0;
+					}
+                    break;
                 case DEVICE_SUPRA:
-                    
 					if (GLOBAL_STATE->board_version == 402) {
                         power_management->chip_temp_avg = EMC2101_get_external_temp();
 						power_management->vr_temp = (float)TPS546_get_temperature();
@@ -176,33 +197,32 @@ void POWER_MANAGEMENT_task(void * pvParameters)
                         power_management->chip_temp_avg = EMC2101_get_internal_temp() + 5;
     					power_management->vr_temp = 0.0;
 					}
-
-                    // EMC2101 will give bad readings if the ASIC is turned off
-                    if(power_management->voltage < TPS546_INIT_VOUT_MIN){
-                        break;
-                    }
-
-                    if ((power_management->vr_temp > TPS546_THROTTLE_TEMP || power_management->chip_temp_avg > THROTTLE_TEMP) &&
-                        (power_management->frequency_value > 50 || power_management->voltage > 1000)) {
-                        ESP_LOGE(TAG, "OVERHEAT  VR: %fC ASIC %fC", power_management->vr_temp, power_management->chip_temp_avg );
-
-                        EMC2101_set_fan_speed(1);
-                        if (GLOBAL_STATE->board_version == 402) {
-                            // Turn off core voltage
-                            VCORE_set_voltage(0.0, GLOBAL_STATE);
-                        } else if (power_management->HAS_POWER_EN) {
-                            gpio_set_level(GPIO_NUM_10, 1);
-                        }
-                        nvs_config_set_u16(NVS_CONFIG_ASIC_VOLTAGE, 1000);
-                        nvs_config_set_u16(NVS_CONFIG_ASIC_FREQ, 50);
-                        nvs_config_set_u16(NVS_CONFIG_FAN_SPEED, 100);
-                        nvs_config_set_u16(NVS_CONFIG_AUTO_FAN_SPEED, 0);
-                        exit(EXIT_FAILURE);
-					}
-
                     break;
 
                 default:
+            }
+
+            // EMC2101 will give bad readings if the ASIC is turned off
+            if(power_management->voltage < TPS546_INIT_VOUT_MIN){
+                break;
+            }
+
+            if ((power_management->vr_temp > TPS546_THROTTLE_TEMP || power_management->chip_temp_avg > THROTTLE_TEMP) &&
+                (power_management->frequency_value > 50 || power_management->voltage > 1000)) {
+                ESP_LOGE(TAG, "OVERHEAT  VR: %fC ASIC %fC", power_management->vr_temp, power_management->chip_temp_avg );
+
+                EMC2101_set_fan_speed(1);
+                if (GLOBAL_STATE->board_version == 402 || GLOBAL_STATE->board_version == 207) {
+                    // Turn off core voltage
+                    VCORE_set_voltage(0.0, GLOBAL_STATE);
+                } else if (power_management->HAS_POWER_EN) {
+                    gpio_set_level(GPIO_NUM_10, 1);
+                }
+                nvs_config_set_u16(NVS_CONFIG_ASIC_VOLTAGE, 1000);
+                nvs_config_set_u16(NVS_CONFIG_ASIC_FREQ, 50);
+                nvs_config_set_u16(NVS_CONFIG_FAN_SPEED, 100);
+                nvs_config_set_u16(NVS_CONFIG_AUTO_FAN_SPEED, 0);
+                exit(EXIT_FAILURE);
             }
         }
 
