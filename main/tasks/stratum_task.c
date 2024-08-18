@@ -154,7 +154,7 @@ void stratum_task(void * pvParameters)
 
             ///// Start Stratum Action
             // mining.subscribe - ID: 1
-            STRATUM_V1_subscribe(GLOBAL_STATE->sock, GLOBAL_STATE->asic_model_str);
+            STRATUM_V1_subscribe(GLOBAL_STATE->sock, GLOBAL_STATE->device_model_str, GLOBAL_STATE->asic_model_str);
 
             // mining.configure - ID: 2
             STRATUM_V1_configure_version_rolling(GLOBAL_STATE->sock, &GLOBAL_STATE->version_mask);
