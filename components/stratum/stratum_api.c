@@ -311,8 +311,9 @@ int STRATUM_V1_subscribe(int socket, char * device, char * model)
     // Subscribe
     char subscribe_msg[BUFFER_SIZE];
     const esp_app_desc_t *app_desc = esp_ota_get_app_description();
-    const char *version = app_desc->version;	
-    sprintf(subscribe_msg, "{\"id\": %d, \"method\": \"mining.subscribe\", \"params\": [\"bitaxe%s/%s/%s\"]}\n", send_uid++, device, model, version);
+    const char *version = app_desc->version;
+    //Not a good idea to do a check for "hex". Need fix later
+    sprintf(subscribe_msg, "{\"id\": %d, \"method\": \"mining.subscribe\", \"params\": [\"bitaxe%s/%s/%s\"]}\n", send_uid++, strcmp ("hex", device) == 0?"Hex":device, model, version);
     debug_stratum_tx(subscribe_msg);
     write(socket, subscribe_msg, strlen(subscribe_msg));
 
