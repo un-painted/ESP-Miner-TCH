@@ -61,7 +61,7 @@ static double automatic_fan_speed(float chip_temp, float vr_temp, GlobalState * 
 
     float perc = (float) result / 100;
 
-    if(GLOBAL_STATE->device_model==DEVICE_HEX){
+    if(GLOBAL_STATE->device_model==DEVICE_HEX||GLOBAL_STATE->device_model==DEVICE_SUPRAHEX){
         if (vr_temp < min_temp) {
             resultTps = min_fan_speed;
         } else if (vr_temp >= TPS546_THROTTLE_TEMP) {
@@ -88,6 +88,7 @@ static double automatic_fan_speed(float chip_temp, float vr_temp, GlobalState * 
             EMC2101_set_fan_speed( perc );
             break;
         case DEVICE_HEX:
+        case DEVICE_SUPRAHEX:
             EMC2302_set_fan_speed(0,perc);
             EMC2302_set_fan_speed(1,perc);
             break;
@@ -164,6 +165,7 @@ void POWER_MANAGEMENT_task(void * pvParameters)
             
                 break;
             case DEVICE_HEX:
+            case DEVICE_SUPRAHEX:
                 power_management->voltage = TPS546_get_vin() * 1000;
                 power_management->current = TPS546_get_iout() * 1000;
                 power_management->power = (TPS546_get_vout() * power_management->current) / 1000;
@@ -237,6 +239,7 @@ void POWER_MANAGEMENT_task(void * pvParameters)
 
                     break;
                 case DEVICE_HEX:
+                case DEVICE_SUPRAHEX:
                     power_management->chip_temp_avg = (TMP1075_read_temperature(0)+TMP1075_read_temperature(1))/2+5;
 					power_management->vr_temp = (float)TPS546_get_temperature();
 
@@ -278,6 +281,7 @@ void POWER_MANAGEMENT_task(void * pvParameters)
                     EMC2101_set_fan_speed((float) fs / 100);
                     break;
                 case DEVICE_HEX:
+                case DEVICE_SUPRAHEX:
                     fs = (float) nvs_config_get_u16(NVS_CONFIG_FAN_SPEED, 100);
                     //ESP_LOGI(TAG, "Manual Fan = %.02f", fs);
                     power_management->fan_perc = fs;

@@ -26,6 +26,7 @@ typedef enum
     DEVICE_ULTRA,
     DEVICE_SUPRA,
     DEVICE_HEX,
+    DEVICE_SUPRAHEX,
 } DeviceModel;
 
 typedef enum
