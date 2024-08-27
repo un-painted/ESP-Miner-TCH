@@ -281,6 +281,7 @@ static uint8_t _send_init(uint64_t frequency, uint16_t asic_count)
     unsigned char init2[11] = {0x55, 0xAA, 0x51, 0x09, 0x00, 0xA4, 0x90, 0x00, 0xFF, 0xFF, 0x1C};
     _send_simple(init2, 11);
 
+
     //read register 00 on all chips (should respond AA 55 13 68 00 00 00 00 00 00 0F)
     unsigned char init3[7] = {0x55, 0xAA, 0x52, 0x05, 0x00, 0x00, 0x0A};
     _send_simple(init3, 7);
@@ -313,7 +314,8 @@ static uint8_t _send_init(uint64_t frequency, uint16_t asic_count)
     // _send_simple(init7, 7);
 
     // split the chip address space evenly
-    uint8_t address_interval = (uint8_t) (256 / chip_counter);
+    //uint8_t address_interval = (uint8_t) (256 / chip_counter);
+    uint8_t address_interval = 2;
     for (uint8_t i = 0; i < chip_counter; i++) {
         _set_chip_address(i * address_interval);
         // unsigned char init8[7] = {0x55, 0xAA, 0x40, 0x05, 0x00, 0x00, 0x1C};
@@ -357,6 +359,9 @@ static uint8_t _send_init(uint64_t frequency, uint16_t asic_count)
         //Core Register Control
         unsigned char set_3c_register_third[6] = {i * address_interval, 0x3C, 0x80, 0x00, 0x82, 0xAA};
         _send_BM1368((TYPE_CMD | GROUP_SINGLE | CMD_WRITE), set_3c_register_third, 6, BM1368_SERIALTX_DEBUG);
+
+        // delay for 500ms
+        vTaskDelay(500 / portTICK_PERIOD_MS);
     }
 
     do_frequency_ramp_up();
@@ -551,12 +556,12 @@ task_result * BM1368_proccess_work(void * pvParameters)
 
     // uint8_t job_id = asic_result->job_id & 0xf8;
     // ESP_LOGI(TAG, "Job ID: %02X, Core: %01X", job_id, asic_result->job_id & 0x07);
-
+    uint8_t asic_nr = (asic_result->nonce & 0x0000fc00)>>10;
     uint8_t job_id = (asic_result->job_id & 0xf0) >> 1;
     uint8_t core_id = (uint8_t)((reverse_uint32(asic_result->nonce) >> 25) & 0x7f); // BM1368 has 80 cores, so it should be coded on 7 bits
     uint8_t small_core_id = asic_result->job_id & 0x0f; // BM1368 has 16 small cores, so it should be coded on 4 bits
     uint32_t version_bits = (reverse_uint16(asic_result->version) << 13); // shift the 16 bit value left 13
-    ESP_LOGI(TAG, "Job ID: %02X, Core: %d/%d, Ver: %08" PRIX32, job_id, core_id, small_core_id, version_bits);
+    ESP_LOGI(TAG, "Asic Num: %d, Job ID: %02X, Core: %d/%d, Ver: %08" PRIX32, asic_nr,job_id, core_id, small_core_id, version_bits);
 
     GlobalState * GLOBAL_STATE = (GlobalState *) pvParameters;
 

@@ -30,7 +30,7 @@ void SERIAL_init(void)
         .parity = UART_PARITY_DISABLE,
         .stop_bits = UART_STOP_BITS_1,
         .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
-        .rx_flow_ctrl_thresh = 122,
+        .rx_flow_ctrl_thresh = 1024,
     };
     // Configure UART1 parameters
     uart_param_config(UART_NUM_1, &uart_config);

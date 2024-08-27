@@ -52,7 +52,7 @@ void app_main(void)
         GLOBAL_STATE.asic_count = 6;
         GLOBAL_STATE.voltage_domain = 3;
     }else if (strcmp(GLOBAL_STATE.device_model_str, "suprahex") == 0) {
-        ESP_LOGI(TAG, "DEVICE: Hex");
+        ESP_LOGI(TAG, "DEVICE: SupraHex");
         GLOBAL_STATE.device_model = DEVICE_SUPRAHEX;
         GLOBAL_STATE.asic_count = 6;
         GLOBAL_STATE.voltage_domain = 3;
@@ -191,7 +191,7 @@ void app_main(void)
         xTaskCreate(stratum_task, "stratum admin", 8192, (void *) &GLOBAL_STATE, 5, NULL);
         xTaskCreate(create_jobs_task, "stratum miner", 8192, (void *) &GLOBAL_STATE, 10, NULL);
         xTaskCreate(ASIC_task, "asic", 8192, (void *) &GLOBAL_STATE, 10, NULL);
-        xTaskCreate(ASIC_result_task, "asic result", 8192, (void *) &GLOBAL_STATE, 15, NULL);
+        xTaskCreate(ASIC_result_task, "asic result", 8192, (void *) &GLOBAL_STATE, 8, NULL);
     }
 }
 

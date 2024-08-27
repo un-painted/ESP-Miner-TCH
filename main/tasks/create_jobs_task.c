@@ -112,7 +112,7 @@ static void process_mining_job(GlobalState *GLOBAL_STATE, mining_notify *notific
     free(coinbase_tx);
     free(merkle_root);
 
-    ESP_LOGI(TAG, "Job processed and queued: %s", notification->job_id);
+    ESP_LOGI(TAG, "Job processed and queued: %s, Queue count: %d", notification->job_id,GLOBAL_STATE->ASIC_jobs_queue.count);
 }
 
 static bool should_generate_more_work(GlobalState *GLOBAL_STATE)
