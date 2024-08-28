@@ -85,6 +85,7 @@ static double automatic_fan_speed(float chip_temp, float vr_temp, GlobalState * 
         case DEVICE_MAX:
         case DEVICE_ULTRA:
         case DEVICE_SUPRA:
+        case DEVICE_GAMMA:
             EMC2101_set_fan_speed( perc );
             break;
         case DEVICE_HEX:
@@ -120,6 +121,7 @@ void POWER_MANAGEMENT_task(void * pvParameters)
         case DEVICE_MAX:
         case DEVICE_ULTRA:
         case DEVICE_SUPRA:
+        case DEVICE_GAMMA:
 			if (GLOBAL_STATE->board_version != 402) {
                 // Configure GPIO12 as input(barrel jack) 1 is plugged in
                 gpio_config_t barrel_jack_conf = {
@@ -171,6 +173,12 @@ void POWER_MANAGEMENT_task(void * pvParameters)
                 power_management->power = (TPS546_get_vout() * power_management->current) / 1000;
                 power_management->fan_rpm = (EMC2302_get_fan_speed(0)+EMC2302_get_fan_speed(1))/2;
                 break;
+            case DEVICE_GAMMA:
+                power_management->voltage = TPS546_get_vin() * 1000;
+                power_management->current = TPS546_get_iout() * 1000;
+                power_management->power = (TPS546_get_vout() * power_management->current) / 1000;
+                power_management->fan_rpm = EMC2101_get_fan_speed();
+                break;
             default:
         }
 
@@ -200,12 +208,13 @@ void POWER_MANAGEMENT_task(void * pvParameters)
 
                 default:
             }
-        } else if (GLOBAL_STATE->asic_model == ASIC_BM1366 || GLOBAL_STATE->asic_model == ASIC_BM1368) {
+        } else if (GLOBAL_STATE->asic_model == ASIC_BM1366 || GLOBAL_STATE->asic_model == ASIC_BM1368|| GLOBAL_STATE->asic_model == ASIC_BM1370) {
             switch (GLOBAL_STATE->device_model) {
                 case DEVICE_MAX:
                 case DEVICE_ULTRA:
                 case DEVICE_SUPRA:
-					if (GLOBAL_STATE->board_version == 402) {
+                case DEVICE_GAMMA:
+					if (GLOBAL_STATE->board_version == 402||GLOBAL_STATE->board_version == 600) {
                         power_management->chip_temp_avg = EMC2101_get_external_temp();
 						power_management->vr_temp = (float)TPS546_get_temperature();
 					} else {
@@ -276,6 +285,7 @@ void POWER_MANAGEMENT_task(void * pvParameters)
                 case DEVICE_MAX:
                 case DEVICE_ULTRA:
                 case DEVICE_SUPRA:
+                case DEVICE_GAMMA:
                     float fs = (float) nvs_config_get_u16(NVS_CONFIG_FAN_SPEED, 100);
                     power_management->fan_perc = fs;
                     EMC2101_set_fan_speed((float) fs / 100);

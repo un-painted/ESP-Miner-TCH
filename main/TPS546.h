@@ -41,7 +41,7 @@ typedef struct
 } TPS546_CONFIG;
 
 static TPS546_CONFIG DEFAULT_CONFIG = {
-  .PROFILE = "TPS546 profile for Ultra and Supra",
+  .PROFILE = "TPS546 profile for Ultra, Supra, and Gamma",
   /* vin voltage */
   .TPS546_INIT_VIN_ON=4.8f,
   .TPS546_INIT_VIN_OFF=4.5f,
