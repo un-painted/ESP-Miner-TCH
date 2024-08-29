@@ -105,7 +105,7 @@ typedef struct
 
     uint32_t stratum_difficulty;
     uint32_t version_mask;
-
+    bool asic_ready;  
     int sock;
 
 } GlobalState;
