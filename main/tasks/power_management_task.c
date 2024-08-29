@@ -16,16 +16,14 @@
 #include <string.h>
 
 #define POLL_RATE 2000
-#define MAX_TEMP 90.0
-#define THROTTLE_TEMP 75.0
-#define THROTTLE_TEMP_RANGE (MAX_TEMP - THROTTLE_TEMP)
-
-#define VOLTAGE_START_THROTTLE 4900
-#define VOLTAGE_MIN_THROTTLE 3500
-#define VOLTAGE_RANGE (VOLTAGE_START_THROTTLE - VOLTAGE_MIN_THROTTLE)
+#define BOARD_MAX_TEMP 90.0
+#define BOARD_THROTTLE_TEMP 75.0
 
 #define TPS546_THROTTLE_TEMP 105.0
-#define TPS546_MAX_TEMP 145.0
+#define TPS546_MAX_TEMP 135.0
+
+#define CHIP_THROTTLE_TEMP 80.0
+#define CHIP_MAX_TEMP 92.0
 
 static const char * TAG = "power_management";
 
@@ -48,13 +46,24 @@ static double automatic_fan_speed(float chip_temp, float vr_temp, GlobalState * 
     double resultTps = 0.0;
     double min_temp = 45.0;
     double min_fan_speed = 45.0;
+    double throttleTemp = BOARD_THROTTLE_TEMP;   //Chip throttle temp;
+
+    switch (GLOBAL_STATE->device_model)
+    {
+    case DEVICE_SUPRAHEX:
+    case DEVICE_GAMMA:
+        throttleTemp = CHIP_THROTTLE_TEMP;
+        break;
+    default:
+        break;
+    }
 
     if (chip_temp < min_temp) {
         result = min_fan_speed;
-    } else if (chip_temp >= THROTTLE_TEMP) {
+    } else if (chip_temp >= throttleTemp) {
         result = 100;
     } else {
-        double temp_range = THROTTLE_TEMP - min_temp;
+        double temp_range = throttleTemp - min_temp;
         double fan_range = 100 - min_fan_speed;
         result = ((chip_temp - min_temp) / temp_range) * fan_range + min_fan_speed;
     }
@@ -76,6 +85,8 @@ static double automatic_fan_speed(float chip_temp, float vr_temp, GlobalState * 
             perc = (float) resultTps / 100;
         }
     }
+
+    //We calculate the highest perc for cooling
 
     
     GLOBAL_STATE->POWER_MANAGEMENT_MODULE.fan_perc = perc;
@@ -191,7 +202,7 @@ void POWER_MANAGEMENT_task(void * pvParameters)
                 case DEVICE_SUPRA:
                     power_management->chip_temp_avg = GLOBAL_STATE->asic_ready?EMC2101_get_external_temp():0;
 
-                    if ((power_management->chip_temp_avg > THROTTLE_TEMP) &&
+                    if ((power_management->chip_temp_avg > BOARD_MAX_TEMP) &&
                         (power_management->frequency_value > 50 || power_management->voltage > 1000)) {
                         ESP_LOGE(TAG, "OVERHEAT ASIC %fC", power_management->chip_temp_avg );
 
@@ -215,9 +226,11 @@ void POWER_MANAGEMENT_task(void * pvParameters)
                 case DEVICE_ULTRA:
                 case DEVICE_SUPRA:
                 case DEVICE_GAMMA:
+                    double chipMaxTemp = BOARD_MAX_TEMP;   //Chip throttle temp; 
 					if (GLOBAL_STATE->board_version == 402||GLOBAL_STATE->board_version == 600) {
                         power_management->chip_temp_avg = GLOBAL_STATE->asic_ready?EMC2101_get_external_temp():0;
 						power_management->vr_temp = (float)TPS546_get_temperature();
+                        chipMaxTemp = CHIP_MAX_TEMP;
 					} else {
                         power_management->chip_temp_avg = EMC2101_get_internal_temp() + 5;
     					power_management->vr_temp = 0.0;
@@ -228,8 +241,10 @@ void POWER_MANAGEMENT_task(void * pvParameters)
                         break;
                     }
 
-                    if ((power_management->vr_temp > TPS546_THROTTLE_TEMP || power_management->chip_temp_avg > THROTTLE_TEMP) &&
+                    ESP_LOGI(TAG, "--------->InternalTemp: %fC", (float)EMC2101_get_internal_temp() + 5);
+                    if ((power_management->vr_temp > TPS546_MAX_TEMP || power_management->chip_temp_avg > chipMaxTemp) &&
                         (power_management->frequency_value > 50 || power_management->voltage > 1000)) {
+                        
                         ESP_LOGE(TAG, "OVERHEAT  VR: %fC ASIC %fC", power_management->vr_temp, power_management->chip_temp_avg );
 
                         EMC2101_set_fan_speed(1);
@@ -257,8 +272,8 @@ void POWER_MANAGEMENT_task(void * pvParameters)
                     if(power_management->voltage < tpsConfig.TPS546_INIT_VOUT_MIN){
                         break;
                     }
-
-                    if ((power_management->vr_temp > TPS546_THROTTLE_TEMP || power_management->chip_temp_avg > THROTTLE_TEMP) &&
+                    // Need to fix for SUPRAHEX which read the actual ASIC temp.
+                    if ((power_management->vr_temp > TPS546_MAX_TEMP || power_management->chip_temp_avg > BOARD_MAX_TEMP) &&
                         (power_management->frequency_value > 50 || power_management->voltage > 1000)) {
                         ESP_LOGE(TAG, "OVERHEAT  VR: %fC ASIC %fC", power_management->vr_temp, power_management->chip_temp_avg );
 
