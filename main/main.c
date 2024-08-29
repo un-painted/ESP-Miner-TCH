@@ -102,7 +102,7 @@ void app_main(void)
         GLOBAL_STATE.ASIC_functions = ASIC_functions;
     }else if (strcmp(GLOBAL_STATE.asic_model_str, "BM1370") == 0) {
         ESP_LOGI(TAG, "ASIC: %dx BM1370 (%" PRIu64 " cores)", GLOBAL_STATE.asic_count, BM1370_CORE_COUNT);
-        GLOBAL_STATE.asic_model = ASIC_BM1368;
+        GLOBAL_STATE.asic_model = ASIC_BM1370;
         AsicFunctions ASIC_functions = {.init_fn = BM1370_init,
                                         .receive_result_fn = BM1370_proccess_work,
                                         .set_max_baud_fn = BM1370_set_max_baud,
