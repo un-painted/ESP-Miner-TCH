@@ -105,7 +105,8 @@ typedef struct
 
     uint32_t stratum_difficulty;
     uint32_t version_mask;
-    bool asic_ready;  
+    bool asic_ready;
+    bool has_chip_temp;
     int sock;
 
 } GlobalState;

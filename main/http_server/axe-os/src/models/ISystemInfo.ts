@@ -37,5 +37,6 @@ export interface ISystemInfo {
     deviceModelStr: string,
     boardtemp1?: number,
     boardtemp2?: number,
-    overheat_mode: number
+    overheat_mode: number,
+    hasChipTemp: boolean
 }

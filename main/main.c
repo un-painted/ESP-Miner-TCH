@@ -29,38 +29,44 @@ void app_main(void)
 
     GLOBAL_STATE.POWER_MANAGEMENT_MODULE.frequency_value = nvs_config_get_u16(NVS_CONFIG_ASIC_FREQ, CONFIG_ASIC_FREQUENCY);
     ESP_LOGI(TAG, "NVS_CONFIG_ASIC_FREQ %f", (float)GLOBAL_STATE.POWER_MANAGEMENT_MODULE.frequency_value);
-
+    GLOBAL_STATE.board_version = atoi(nvs_config_get_string(NVS_CONFIG_BOARD_VERSION, "000"));
     GLOBAL_STATE.device_model_str = nvs_config_get_string(NVS_CONFIG_DEVICE_MODEL, "");
     if (strcmp(GLOBAL_STATE.device_model_str, "max") == 0) {
         ESP_LOGI(TAG, "DEVICE: Max");
         GLOBAL_STATE.device_model = DEVICE_MAX;
         GLOBAL_STATE.asic_count = 1;
         GLOBAL_STATE.voltage_domain = 1;
+        GLOBAL_STATE.has_chip_temp = false;
     } else if (strcmp(GLOBAL_STATE.device_model_str, "ultra") == 0) {
         ESP_LOGI(TAG, "DEVICE: Ultra");
         GLOBAL_STATE.device_model = DEVICE_ULTRA;
         GLOBAL_STATE.asic_count = 1;
         GLOBAL_STATE.voltage_domain = 1;
+        GLOBAL_STATE.has_chip_temp = false;
     } else if (strcmp(GLOBAL_STATE.device_model_str, "supra") == 0) {
         ESP_LOGI(TAG, "DEVICE: Supra");
         GLOBAL_STATE.device_model = DEVICE_SUPRA;
         GLOBAL_STATE.asic_count = 1;
         GLOBAL_STATE.voltage_domain = 1;
+        GLOBAL_STATE.has_chip_temp = GLOBAL_STATE.board_version==402;
     }else if (strcmp(GLOBAL_STATE.device_model_str, "hex") == 0) {
         ESP_LOGI(TAG, "DEVICE: Hex");
         GLOBAL_STATE.device_model = DEVICE_HEX;
         GLOBAL_STATE.asic_count = 6;
         GLOBAL_STATE.voltage_domain = 3;
+        GLOBAL_STATE.has_chip_temp = false;
     }else if (strcmp(GLOBAL_STATE.device_model_str, "suprahex") == 0) {
         ESP_LOGI(TAG, "DEVICE: SupraHex");
         GLOBAL_STATE.device_model = DEVICE_SUPRAHEX;
         GLOBAL_STATE.asic_count = 6;
         GLOBAL_STATE.voltage_domain = 3;
+        GLOBAL_STATE.has_chip_temp = false; //Fix later
     }else if (strcmp(GLOBAL_STATE.device_model_str, "gamma") == 0) {
         ESP_LOGI(TAG, "DEVICE: Gamma");
         GLOBAL_STATE.device_model = DEVICE_GAMMA;
         GLOBAL_STATE.asic_count = 1;
         GLOBAL_STATE.voltage_domain = 1;
+        GLOBAL_STATE.has_chip_temp = true;
     } else {
         ESP_LOGE(TAG, "Invalid DEVICE model");
         // maybe should return here to now execute anything with a faulty device parameter !
@@ -69,7 +75,7 @@ void app_main(void)
         GLOBAL_STATE.asic_count = -1;
         GLOBAL_STATE.voltage_domain = 1;
     }
-    GLOBAL_STATE.board_version = atoi(nvs_config_get_string(NVS_CONFIG_BOARD_VERSION, "000"));
+    
     ESP_LOGI(TAG, "Found Device Model: %s", GLOBAL_STATE.device_model_str);
     ESP_LOGI(TAG, "Found Board Version: %d", GLOBAL_STATE.board_version);
 
@@ -210,7 +216,7 @@ void app_main(void)
         xTaskCreate(stratum_task, "stratum admin", 8192, (void *) &GLOBAL_STATE, 5, NULL);
         xTaskCreate(create_jobs_task, "stratum miner", 8192, (void *) &GLOBAL_STATE, 10, NULL);
         xTaskCreate(ASIC_task, "asic", 8192, (void *) &GLOBAL_STATE, 10, NULL);
-        xTaskCreate(ASIC_result_task, "asic result", 8192, (void *) &GLOBAL_STATE, 8, NULL);
+        xTaskCreate(ASIC_result_task, "asic result", 8192, (void *) &GLOBAL_STATE, 15, NULL);
     }
 }
 

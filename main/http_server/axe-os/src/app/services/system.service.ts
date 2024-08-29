@@ -57,7 +57,8 @@ export class SystemService {
           deviceModelStr: "unknown",
           boardtemp1: 30,
           boardtemp2: 40,
-          overheat_mode: 0
+          overheat_mode: 0,
+          hasChipTemp: false
         }
       ).pipe(delay(1000));
     }

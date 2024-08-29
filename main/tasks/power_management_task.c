@@ -22,8 +22,8 @@
 #define TPS546_THROTTLE_TEMP 105.0
 #define TPS546_MAX_TEMP 135.0
 
-#define CHIP_THROTTLE_TEMP 80.0
-#define CHIP_MAX_TEMP 92.0
+#define CHIP_THROTTLE_TEMP 85.0
+#define CHIP_MAX_TEMP 95.0
 
 static const char * TAG = "power_management";
 

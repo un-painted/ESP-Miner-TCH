@@ -391,6 +391,7 @@ static esp_err_t GET_system_info(httpd_req_t * req)
     cJSON_AddNumberToObject(root, "sharesRejected", GLOBAL_STATE->SYSTEM_MODULE.shares_rejected);
     cJSON_AddNumberToObject(root, "uptimeSeconds", (esp_timer_get_time() - GLOBAL_STATE->SYSTEM_MODULE.start_time) / 1000000);
     cJSON_AddNumberToObject(root, "asicCount", GLOBAL_STATE->asic_count);
+    cJSON_AddNumberToObject(root, "hasChipTemp", GLOBAL_STATE->has_chip_temp);
     uint16_t small_core_count = 0;
     switch (GLOBAL_STATE->asic_model){
         case ASIC_BM1397:
