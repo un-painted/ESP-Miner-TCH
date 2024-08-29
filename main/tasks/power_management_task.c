@@ -121,7 +121,6 @@ void POWER_MANAGEMENT_task(void * pvParameters)
         case DEVICE_MAX:
         case DEVICE_ULTRA:
         case DEVICE_SUPRA:
-        case DEVICE_GAMMA:
 			if (GLOBAL_STATE->board_version != 402) {
                 // Configure GPIO12 as input(barrel jack) 1 is plugged in
                 gpio_config_t barrel_jack_conf = {
@@ -141,10 +140,12 @@ void POWER_MANAGEMENT_task(void * pvParameters)
                 }
 			}
             break;
+        case DEVICE_GAMMA:
+            break;
         default:
     }
 
-    vTaskDelay(3000 / portTICK_PERIOD_MS);
+    vTaskDelay(4000 / portTICK_PERIOD_MS);
 
     while (1) {
         auto_fan_speed = nvs_config_get_u16(NVS_CONFIG_AUTO_FAN_SPEED, 1);
