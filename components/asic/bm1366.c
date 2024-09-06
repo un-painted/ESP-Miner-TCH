@@ -425,6 +425,13 @@ static uint8_t _send_init(uint64_t frequency, uint16_t asic_count)
     }
     ESP_LOGI(TAG, "%i chip(s) detected on the chain, expected %i", chip_counter, asic_count);
 
+    if(chip_counter!=asic_count){
+         // delay for 2000ms
+         // This restart for chip voltage balancing
+        vTaskDelay(2000 / portTICK_PERIOD_MS);
+        exit(EXIT_FAILURE);
+    }
+
     unsigned char init4[11] = {0x55, 0xAA, 0x51, 0x09, 0x00, 0xA8, 0x00, 0x07, 0x00, 0x00, 0x03};
     _send_simple(init4, 11);
 

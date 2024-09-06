@@ -159,6 +159,7 @@ void POWER_MANAGEMENT_task(void * pvParameters)
     vTaskDelay(4000 / portTICK_PERIOD_MS);
 
     while (1) {
+        TPS546_check_status();
         auto_fan_speed = nvs_config_get_u16(NVS_CONFIG_AUTO_FAN_SPEED, 1);
         switch (GLOBAL_STATE->device_model) {
             case DEVICE_MAX:
@@ -241,7 +242,7 @@ void POWER_MANAGEMENT_task(void * pvParameters)
                         break;
                     }
 
-                    ESP_LOGI(TAG, "--------->InternalTemp: %fC", (float)EMC2101_get_internal_temp() + 5);
+                    //ESP_LOGI(TAG, "--------->InternalTemp: %fC", (float)EMC2101_get_internal_temp() + 5);
                     if ((power_management->vr_temp > TPS546_MAX_TEMP || power_management->chip_temp_avg > chipMaxTemp) &&
                         (power_management->frequency_value > 50 || power_management->voltage > 1000)) {
                         

@@ -138,6 +138,25 @@ static TPS546_CONFIG HEX_CONFIG = {
 #define ON_OFF_CONFIG_DELAY 0x00 // turn off DELAY bit
 
 
+/* Bit masks for status faults */
+#define PMBUS_FAULT_SECONDARY 0x0001 /* need to check STATUS_WORD */
+#define PMBUS_FAULT_CML       0x0002 /* need to check STATUS_CML */
+#define PMBUS_FAULT_TEMP      0x0004 /* need to check STATUS_TEMP */
+#define PMBUS_FAULT_VIN_UV    0x0008
+#define PMBUS_FAULT_IOUT_OC   0x0010
+#define PMBUS_FAULT_VOUT_OV   0x0020
+#define PMBUS_FAULT_OFF       0x0040
+#define PMBUS_FAULT_BUSY      0x0080
+/* NOT SUPPORTED              0x0100 */
+#define PMBUS_FAULT_OTHER     0x0200 /* need to check STATUS_OTHER */
+/* NOT SUPPORTED              0x0400 */
+#define PMBUS_FAULT_PGOOD     0x0800
+#define PMBUS_FAULT_MFR       0x1000 /* need to check STATUS_MFR */
+#define PMBUS_FAULT_INPUT     0x2000 /* need to check STATUS_INPUT */
+#define PMBUS_FAULT_IOUT      0x4000 /* need to check STATUS_IOUT  */
+#define PMBUS_FAULT_VOUT      0x8000 /* need to check STATUS_VOUT  */
+
+
 /* public functions */
 int TPS546_init(TPS546_CONFIG);
 void TPS546_read_mfr_info(uint8_t *);
@@ -151,5 +170,7 @@ float TPS546_get_iout(void);
 float TPS546_get_vout(void);
 void TPS546_set_vout(float volts);
 void TPS546_show_voltage_settings(void);
+
+void TPS546_check_status(void);
 
 #endif /* TPS546_H_ */
