@@ -295,6 +295,14 @@ static uint8_t _send_init(uint64_t frequency, uint16_t asic_count)
         }
     }
     ESP_LOGI(TAG, "%i chip(s) detected on the chain, expected %i", chip_counter, asic_count);
+    
+    if(chip_counter!=asic_count){
+         // delay for 2000ms
+         // This restart for chip voltage balancing, Since at very begining, TPS outout not enought voltage.
+        ESP_LOGE(TAG, "Initializing BM1366 fail - Mismatch amount of chips. This may caused by TPS not yet initialize and provide not enough voltage");
+        vTaskDelay(2000 / portTICK_PERIOD_MS);
+        exit(EXIT_FAILURE);
+    }
 
     //enable and set version rolling mask to 0xFFFF (again)
     unsigned char init4[11] = {0x55, 0xAA, 0x51, 0x09, 0x00, 0xA4, 0x90, 0x00, 0xFF, 0xFF, 0x1C};
