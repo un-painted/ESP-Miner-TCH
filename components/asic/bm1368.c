@@ -59,6 +59,8 @@ static const char * TAG = "bm1368Module";
 
 static uint8_t asic_response_buffer[SERIAL_BUF_SIZE];
 static task_result result;
+static int chipSubmitCount[6];
+static int norceCount=0;
 
 /// @brief
 /// @param ftdi
@@ -295,7 +297,7 @@ static uint8_t _send_init(uint64_t frequency, uint16_t asic_count)
         }
     }
     ESP_LOGI(TAG, "%i chip(s) detected on the chain, expected %i", chip_counter, asic_count);
-    
+
     if(chip_counter!=asic_count){
          // delay for 2000ms
          // This restart for chip voltage balancing, Since at very begining, TPS outout not enought voltage.
@@ -570,9 +572,16 @@ task_result * BM1368_proccess_work(void * pvParameters)
     uint8_t small_core_id = asic_result->job_id & 0x0f; // BM1368 has 16 small cores, so it should be coded on 4 bits
     uint32_t version_bits = (reverse_uint16(asic_result->version) << 13); // shift the 16 bit value left 13
     ESP_LOGI(TAG, "Asic Num: %d, Job ID: %02X, Core: %d/%d, Ver: %08" PRIX32, asic_nr,job_id, core_id, small_core_id, version_bits);
-
+    chipSubmitCount[asic_nr]=chipSubmitCount[asic_nr]+1;
     GlobalState * GLOBAL_STATE = (GlobalState *) pvParameters;
-
+    if(norceCount%10==0){
+        ESP_LOGI(TAG, "Asic Submit Count: [%d, %d, %d, %d, %d, %d]" PRIX32, chipSubmitCount[0],chipSubmitCount[1],chipSubmitCount[2],chipSubmitCount[3],chipSubmitCount[4],chipSubmitCount[5]);
+    }
+    norceCount++;
+    if(norceCount==1000000){
+        for(int a=0;a<6;a++)
+            chipSubmitCount[a]=0;
+    }
     if (GLOBAL_STATE->valid_jobs[job_id] == 0) {
         ESP_LOGE(TAG, "Invalid job nonce found, 0x%02X", job_id);
         return NULL;

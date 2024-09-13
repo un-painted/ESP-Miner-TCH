@@ -25,6 +25,8 @@
 #define CHIP_THROTTLE_TEMP 85.0
 #define CHIP_MAX_TEMP 95.0
 
+#define HEX_POWER_OFFSET 16
+
 static const char * TAG = "power_management";
 
 static float _fbound(float value, float lower_bound, float upper_bound)
@@ -126,6 +128,8 @@ void POWER_MANAGEMENT_task(void * pvParameters)
 
     uint16_t auto_fan_speed = nvs_config_get_u16(NVS_CONFIG_AUTO_FAN_SPEED, 1);
 
+    float power_offset = 0;
+
     TPS546_CONFIG tpsConfig = DEFAULT_CONFIG;
 
     switch (GLOBAL_STATE->device_model) {
@@ -181,7 +185,7 @@ void POWER_MANAGEMENT_task(void * pvParameters)
             case DEVICE_SUPRAHEX:
                 power_management->voltage = TPS546_get_vin() * 1000;
                 power_management->current = TPS546_get_iout() * 1000;
-                power_management->power = (TPS546_get_vout() * power_management->current) / 1000;
+                power_management->power = (TPS546_get_vout() * power_management->current) / 1000 + HEX_POWER_OFFSET;
                 break;
             case DEVICE_GAMMA:
                 power_management->voltage = TPS546_get_vin() * 1000;

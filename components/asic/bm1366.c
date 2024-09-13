@@ -59,6 +59,8 @@ static const char * TAG = "bm1366Module";
 
 static uint8_t asic_response_buffer[SERIAL_BUF_SIZE];
 static task_result result;
+static int chipSubmitCount[6];
+static int norceCount=0;
 
 /// @brief
 /// @param ftdi
@@ -444,11 +446,11 @@ static uint8_t _send_init(uint64_t frequency, uint16_t asic_count)
     // _send_simple(init6, 7);
 
     // split the chip address space evenly
-    uint8_t address_interval = (uint8_t) (256 / chip_counter);
+    uint8_t address_interval = 2;
     for (uint8_t i = 0; i < chip_counter; i++) {
         _set_chip_address(i * address_interval);
-        // unsigned char init7[7] = { 0x55, 0xAA, 0x40, 0x05, 0x00, 0x00, 0x1C };
-        // _send_simple(init7, 7);
+        // unsigned char init8[7] = {0x55, 0xAA, 0x40, 0x05, 0x00, 0x00, 0x1C};
+        // _send_simple(init8, 7);
     }
 
     unsigned char init135[11] = {0x55, 0xAA, 0x51, 0x09, 0x00, 0x3C, 0x80, 0x00, 0x85, 0x40, 0x0C};
@@ -676,14 +678,22 @@ task_result * BM1366_proccess_work(void * pvParameters)
         return NULL;
     }
 
+    uint8_t asic_nr = (asic_result->nonce & 0x0000fc00)>>10;
     uint8_t job_id = asic_result->job_id & 0xf8;
     uint8_t core_id = (uint8_t)((reverse_uint32(asic_result->nonce) >> 25) & 0x7f); // BM1366 has 112 cores, so it should be coded on 7 bits
     uint8_t small_core_id = asic_result->job_id & 0x07; // BM1366 has 8 small cores, so it should be coded on 3 bits
     uint32_t version_bits = (reverse_uint16(asic_result->version) << 13); // shift the 16 bit value left 13
-    ESP_LOGI(TAG, "Job ID: %02X, Core: %d/%d, Ver: %08" PRIX32, job_id, core_id, small_core_id, version_bits);
-
+    ESP_LOGI(TAG, "Asic Num: %d, Job ID: %02X, Core: %d/%d, Ver: %08" PRIX32, asic_nr,job_id, core_id, small_core_id, version_bits);
+    chipSubmitCount[asic_nr]=chipSubmitCount[asic_nr]+1;
     GlobalState * GLOBAL_STATE = (GlobalState *) pvParameters;
-
+    if(norceCount%10==0){
+        ESP_LOGI(TAG, "Asic Submit Count: [%d, %d, %d, %d, %d, %d]" PRIX32, chipSubmitCount[0],chipSubmitCount[1],chipSubmitCount[2],chipSubmitCount[3],chipSubmitCount[4],chipSubmitCount[5]);
+    }
+    norceCount++;
+    if(norceCount==1000000){
+        for(int a=0;a<6;a++)
+            chipSubmitCount[a]=0;
+    }
     if (GLOBAL_STATE->valid_jobs[job_id] == 0) {
         ESP_LOGE(TAG, "Invalid job found, 0x%02X", job_id);
         return NULL;

@@ -59,6 +59,8 @@ static const char * TAG = "bm1370Module";
 
 static uint8_t asic_response_buffer[SERIAL_BUF_SIZE];
 static task_result result;
+static int chipSubmitCount[6];
+static int norceCount=0;
 
 /// @brief
 /// @param ftdi
@@ -319,7 +321,7 @@ static uint8_t _send_init(uint64_t frequency, uint16_t asic_count)
         }
     }
     ESP_LOGI(TAG, "%i chip(s) detected on the chain, expected %i", chip_counter, asic_count);
-    
+
     if(chip_counter!=asic_count){
          // delay for 2000ms
          // This restart for chip voltage balancing, Since at very begining, TPS outout not enought voltage.
@@ -348,7 +350,7 @@ static uint8_t _send_init(uint64_t frequency, uint16_t asic_count)
     // _send_simple(init7, 7);
 
     // split the chip address space evenly
-    uint8_t address_interval = (uint8_t) (256 / chip_counter);
+    uint8_t address_interval = 2;
     for (uint8_t i = 0; i < chip_counter; i++) {
         _set_chip_address(i * address_interval);
         // unsigned char init8[7] = {0x55, 0xAA, 0x40, 0x05, 0x00, 0x00, 0x1C};
