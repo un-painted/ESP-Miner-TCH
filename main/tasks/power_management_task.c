@@ -159,7 +159,7 @@ void POWER_MANAGEMENT_task(void * pvParameters)
     vTaskDelay(4000 / portTICK_PERIOD_MS);
 
     while (1) {
-        TPS546_check_status();
+        //TPS546_check_status();
         auto_fan_speed = nvs_config_get_u16(NVS_CONFIG_AUTO_FAN_SPEED, 1);
         switch (GLOBAL_STATE->device_model) {
             case DEVICE_MAX:
@@ -176,21 +176,17 @@ void POWER_MANAGEMENT_task(void * pvParameters)
                     power_management->power = INA260_read_power() / 1000;
 				}
             
-                power_management->fan_rpm = EMC2101_get_fan_speed();
-            
                 break;
             case DEVICE_HEX:
             case DEVICE_SUPRAHEX:
                 power_management->voltage = TPS546_get_vin() * 1000;
                 power_management->current = TPS546_get_iout() * 1000;
                 power_management->power = (TPS546_get_vout() * power_management->current) / 1000;
-                power_management->fan_rpm = (EMC2302_get_fan_speed(0)+EMC2302_get_fan_speed(1))/2;
                 break;
             case DEVICE_GAMMA:
                 power_management->voltage = TPS546_get_vin() * 1000;
                 power_management->current = TPS546_get_iout() * 1000;
                 power_management->power = (TPS546_get_vout() * power_management->current) / 1000;
-                power_management->fan_rpm = EMC2101_get_fan_speed();
                 break;
             default:
         }

@@ -89,5 +89,16 @@ bool VCORE_set_voltage(float core_voltage, GlobalState * global_state)
 }
 
 uint16_t VCORE_get_voltage_mv(GlobalState * global_state) {
+
+    switch (global_state->device_model) {
+        case DEVICE_HEX:
+        case DEVICE_SUPRAHEX:
+        case DEVICE_GAMMA:
+            return (TPS546_get_vout() * 1000) / global_state->voltage_domain;
+            break;
+        default:
+    }
+
+
     return ADC_get_vcore() / global_state->voltage_domain;
 }
