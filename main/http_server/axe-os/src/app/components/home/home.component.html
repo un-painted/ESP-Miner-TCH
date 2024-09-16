@@ -99,7 +99,7 @@
                 </div>
 
                 <div class="col-4">
-                    <p-knob [min]="4.5" [max]="5.5" [readonly]="true" [(ngModel)]="info.voltage"
+                    <p-knob [min]="4.0" [max]="5.5" [readonly]="true" [(ngModel)]="info.voltage"
                         valueTemplate="{value}V"></p-knob>
                     Input Voltage
                     <span class="danger" *ngIf="info.voltage < 4.4">&nbsp; Danger: Low voltage</span>

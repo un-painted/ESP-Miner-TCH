@@ -26,6 +26,7 @@
 #define CHIP_MAX_TEMP 95.0
 
 #define HEX_POWER_OFFSET 16
+#define GAMMA_POWER_OFFSET 5
 
 static const char * TAG = "power_management";
 
@@ -190,7 +191,7 @@ void POWER_MANAGEMENT_task(void * pvParameters)
             case DEVICE_GAMMA:
                 power_management->voltage = TPS546_get_vin() * 1000;
                 power_management->current = TPS546_get_iout() * 1000;
-                power_management->power = (TPS546_get_vout() * power_management->current) / 1000;
+                power_management->power = (TPS546_get_vout() * power_management->current) / 1000 + GAMMA_POWER_OFFSET;
                 break;
             default:
         }

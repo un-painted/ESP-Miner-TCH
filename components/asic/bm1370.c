@@ -587,15 +587,22 @@ task_result * BM1370_proccess_work(void * pvParameters)
 
     // uint8_t job_id = asic_result->job_id & 0xf8;
     // ESP_LOGI(TAG, "Job ID: %02X, Core: %01X", job_id, asic_result->job_id & 0x07);
-
+    uint8_t asic_nr = (asic_result->nonce & 0x0000fc00)>>10;
     uint8_t job_id = (asic_result->job_id & 0xf0) >> 1;
     uint8_t core_id = (uint8_t)((reverse_uint32(asic_result->nonce) >> 25) & 0x7f); // BM1370 has 80 cores, so it should be coded on 7 bits
     uint8_t small_core_id = asic_result->job_id & 0x0f; // BM1370 has 16 small cores, so it should be coded on 4 bits
     uint32_t version_bits = (reverse_uint16(asic_result->version) << 13); // shift the 16 bit value left 13
     ESP_LOGI(TAG, "Job ID: %02X, Core: %d/%d, Ver: %08" PRIX32, job_id, core_id, small_core_id, version_bits);
-
+    chipSubmitCount[asic_nr]=chipSubmitCount[asic_nr]+1;
     GlobalState * GLOBAL_STATE = (GlobalState *) pvParameters;
-
+    if(norceCount%10==0){
+        ESP_LOGI(TAG, "Asic Submit Count: [%d, %d, %d, %d, %d, %d]" PRIX32, chipSubmitCount[0],chipSubmitCount[1],chipSubmitCount[2],chipSubmitCount[3],chipSubmitCount[4],chipSubmitCount[5]);
+    }
+    norceCount++;
+    if(norceCount==1000000){
+        for(int a=0;a<6;a++)
+            chipSubmitCount[a]=0;
+    }
     if (GLOBAL_STATE->valid_jobs[job_id] == 0) {
         ESP_LOGE(TAG, "Invalid job nonce found, 0x%02X", job_id);
         return NULL;
