@@ -14,6 +14,7 @@
 #include "TPS546.h"
 #include "vcore.h"
 #include <string.h>
+#include "max6689.h"
 
 #define POLL_RATE 2000
 #define BOARD_MAX_TEMP 90.0
@@ -26,6 +27,7 @@
 #define CHIP_MAX_TEMP 95.0
 
 #define HEX_POWER_OFFSET 16
+#define GAMMA_POWER_OFFSET 5
 
 static const char * TAG = "power_management";
 
@@ -157,6 +159,9 @@ void POWER_MANAGEMENT_task(void * pvParameters)
             break;
         case DEVICE_GAMMA:
             break;
+        case DEVICE_SUPRAHEX:
+            max6689_init();
+            break;
         default:
     }
 
@@ -190,7 +195,7 @@ void POWER_MANAGEMENT_task(void * pvParameters)
             case DEVICE_GAMMA:
                 power_management->voltage = TPS546_get_vin() * 1000;
                 power_management->current = TPS546_get_iout() * 1000;
-                power_management->power = (TPS546_get_vout() * power_management->current) / 1000;
+                power_management->power = (TPS546_get_vout() * power_management->current) / 1000 + GAMMA_POWER_OFFSET;
                 break;
             default:
         }
@@ -266,6 +271,10 @@ void POWER_MANAGEMENT_task(void * pvParameters)
                     break;
                 case DEVICE_HEX:
                 case DEVICE_SUPRAHEX:
+                    uint8_t temps[6] = {0,0,0,0,0,0};
+                    max6689_read_temp(temps);
+                    ESP_LOGI(TAG,"Diode Temp: [%d,%d,%d,%d,%d,%d]",temps[0],temps[1],temps[2],temps[3],temps[4],temps[5]);
+
                     power_management->chip_temp_avg = (TMP1075_read_temperature(0)+TMP1075_read_temperature(1))/2+5;
 					power_management->vr_temp = (float)TPS546_get_temperature();
 

@@ -2,10 +2,18 @@
 #define MAX6689_H_
 
 #define MAX6689_I2CADDR 0x4D
+#define MAX6689_MANUFACTURER_ADDR 0x0A
+#define MAX6689_MANUFACTURER_ID 0x4D
+
 #define MAX6689_ERR_OPEN 0xFF
 #define MAX6689_ERR_SHORT 0xEE
 
+#define MAX6689_CONFIG2_ADDR 0x42
+#define MAX6689_CONFIG3_ADDR 0x43
+#define MAX6689_ALERT_MASK 0x7F
+#define MAX6689_OVERT_MASK 0x39
+
 int max6689_init();
-float max6689_read_temp(uint8_t);
+int max6689_read_temp(uint8_t*);
 
 #endif /* MAX6689_H_ */
