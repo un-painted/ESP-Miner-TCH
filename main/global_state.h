@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "asic_task.h"
+#include "bm1370.h"
 #include "bm1368.h"
 #include "bm1366.h"
 #include "bm1397.h"
@@ -108,7 +109,7 @@ typedef struct
     bool asic_ready;
     bool has_chip_temp;
     int sock;
-
+    bool ASIC_initalized;
 } GlobalState;
 
 #endif /* GLOBAL_STATE_H_ */
