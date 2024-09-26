@@ -114,26 +114,6 @@ export class EditComponent implements OnInit {
     { name: '1250', value: 1250 },
     { name: '1300', value: 1300 },
   ];
-  public BM1370DropdownFrequency = [
-    { name: '400', value: 400 },
-    { name: '490', value: 490 },
-    { name: '525', value: 525 },
-    { name: '575', value: 575 },
-    { name: '596 (default)', value: 596 },
-    { name: '610', value: 610 },
-    { name: '625', value: 625 },
-  ];
-
-  public BM1370CoreVoltage = [
-    { name: '900', value: 900 },
-    { name: '950', value: 950 },
-    { name: '1000', value: 1000 },
-    { name: '1060 (default)', value: 1060 },
-    { name: '1100', value: 1100 },
-    { name: '1150', value: 1150 },
-    { name: '1200', value: 1200 },
-    { name: '1250', value: 1250 },
-  ];
 
   constructor(
     private fb: FormBuilder,
