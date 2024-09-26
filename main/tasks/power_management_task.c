@@ -272,8 +272,8 @@ void POWER_MANAGEMENT_task(void * pvParameters)
                 case DEVICE_HEX:
                 case DEVICE_SUPRAHEX:
                     uint8_t temps[6] = {0,0,0,0,0,0};
-                    max6689_read_temp(temps);
-                    ESP_LOGI(TAG,"Diode Temp: [%d,%d,%d,%d,%d,%d]",temps[0],temps[1],temps[2],temps[3],temps[4],temps[5]);
+                    //max6689_read_temp(temps);
+                    //ESP_LOGI(TAG,"Diode Temp: [%d,%d,%d,%d,%d,%d]",temps[0],temps[1],temps[2],temps[3],temps[4],temps[5]);
 
                     power_management->chip_temp_avg = (TMP1075_read_temperature(0)+TMP1075_read_temperature(1))/2+5;
 					power_management->vr_temp = (float)TPS546_get_temperature();
