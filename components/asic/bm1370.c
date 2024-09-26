@@ -304,14 +304,7 @@ static uint8_t _send_init(uint64_t frequency, uint16_t asic_count)
         _send_BM1370((TYPE_CMD | GROUP_SINGLE | CMD_WRITE), set_3c_register_second, 6, BM1370_SERIALTX_DEBUG);
         //Core Register Control
         unsigned char set_3c_register_third[6] = {i * address_interval, 0x3C, 0x80, 0x00, 0x82, 0xAA};
-<<<<<<<< HEAD:components/asic/bm1368.c
-        _send_BM1368((TYPE_CMD | GROUP_SINGLE | CMD_WRITE), set_3c_register_third, 6, BM1368_SERIALTX_DEBUG);
-
-        // delay for 500ms
-        vTaskDelay(500 / portTICK_PERIOD_MS);
-========
         _send_BM1370((TYPE_CMD | GROUP_SINGLE | CMD_WRITE), set_3c_register_third, 6, BM1370_SERIALTX_DEBUG);
->>>>>>>> master:components/asic/bm1370.c
     }
 
     do_frequency_ramp_up(frequency);
