@@ -21,14 +21,16 @@
 
 static const char *TAG = "vcore.c";
 
-void VCORE_init(GlobalState * global_state) {
+uint8_t VCORE_init(GlobalState * global_state) {
+    uint8_t result=0;
     if (global_state->board_version == 402||global_state->board_version == 600) {
-        TPS546_init(DEFAULT_CONFIG);
+        result = TPS546_init(DEFAULT_CONFIG);
     }else if((global_state->board_version >= 300 && global_state->board_version < 400)
                 ||(global_state->board_version >= 700 && global_state->board_version < 800)){
-        TPS546_init(HEX_CONFIG);
+        result = TPS546_init(HEX_CONFIG);
     }
     ADC_init();
+    return result;
 }
 
 /**
