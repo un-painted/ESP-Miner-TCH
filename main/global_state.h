@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "asic_task.h"
+#include "bm1370.h"
 #include "bm1368.h"
 #include "bm1366.h"
 #include "bm1397.h"
@@ -25,6 +26,7 @@ typedef enum
     DEVICE_MAX,
     DEVICE_ULTRA,
     DEVICE_SUPRA,
+    DEVICE_GAMMA,
 } DeviceModel;
 
 typedef enum
@@ -33,6 +35,7 @@ typedef enum
     ASIC_BM1397,
     ASIC_BM1366,
     ASIC_BM1368,
+    ASIC_BM1370,
 } AsicModel;
 
 typedef struct
@@ -102,7 +105,7 @@ typedef struct
     uint32_t version_mask;
 
     int sock;
-
+    bool ASIC_initalized;
 } GlobalState;
 
 #endif /* GLOBAL_STATE_H_ */

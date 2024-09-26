@@ -21,11 +21,24 @@
 
 static const char *TAG = "vcore.c";
 
-void VCORE_init(GlobalState * global_state) {
-    if (global_state->board_version == 402) {
-        TPS546_init();
+uint8_t VCORE_init(GlobalState * global_state) {
+    uint8_t result = 0;
+    switch (global_state->device_model) {
+        case DEVICE_MAX:
+        case DEVICE_ULTRA:
+        case DEVICE_SUPRA:
+            if (global_state->board_version >= 402 && global_state->board_version <= 499) {
+                result = TPS546_init();
+            }
+            break;
+        case DEVICE_GAMMA:
+            result = TPS546_init();
+            break;
+        // case DEVICE_HEX:
+        default:
     }
     ADC_init();
+    return result;
 }
 
 /**
@@ -62,7 +75,7 @@ bool VCORE_set_voltage(float core_voltage, GlobalState * global_state)
         case DEVICE_MAX:
         case DEVICE_ULTRA:
         case DEVICE_SUPRA:
-            if (global_state->board_version == 402) {
+            if (global_state->board_version >= 402 && global_state->board_version <= 499) {
                 ESP_LOGI(TAG, "Set ASIC voltage = %.3fV", core_voltage);
                 TPS546_set_vout(core_voltage * (float)global_state->voltage_domain);
             } else {
@@ -70,6 +83,10 @@ bool VCORE_set_voltage(float core_voltage, GlobalState * global_state)
                 ESP_LOGI(TAG, "Set ASIC voltage = %.3fV [0x%02X]", core_voltage, reg_setting);
                 DS4432U_set_current_code(0, reg_setting); /// eek!
             }
+            break;
+        case DEVICE_GAMMA:
+                ESP_LOGI(TAG, "Set ASIC voltage = %.3fV", core_voltage);
+                TPS546_set_vout(core_voltage * (float)global_state->voltage_domain);
             break;
         // case DEVICE_HEX:
         default:
