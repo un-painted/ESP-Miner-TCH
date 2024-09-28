@@ -5,8 +5,6 @@
 #include "driver/gpio.h"
 #include "mining.h"
 
-#define ASIC_BM1368_JOB_FREQUENCY_MS 500
-
 #define CRC5_MASK 0x1F
 #define BM1368_INITIAL_DIFFICULTY 256
 
@@ -42,8 +40,7 @@ void BM1368_send_work(void * GLOBAL_STATE, bm_job * next_bm_job);
 void BM1368_set_job_difficulty_mask(int);
 int BM1368_set_max_baud(void);
 int BM1368_set_default_baud(void);
-bool BM1368_send_hash_frequency(float frequency);
-bool do_frequency_transition(float target_frequency);
+void BM1368_send_hash_frequency(float frequency);
 task_result * BM1368_proccess_work(void * GLOBAL_STATE);
 
 #endif /* BM1368_H_ */

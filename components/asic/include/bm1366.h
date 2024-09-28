@@ -5,15 +5,13 @@
 #include "driver/gpio.h"
 #include "mining.h"
 
-#define ASIC_BM1366_JOB_FREQUENCY_MS 2000
-
 #define CRC5_MASK 0x1F
 #define BM1366_INITIAL_DIFFICULTY 256
 
 #define BM1366_SERIALTX_DEBUG false
 #define BM1366_SERIALRX_DEBUG false
 #define BM1366_DEBUG_WORK false //causes insane amount of debug output
-#define BM1366_DEBUG_JOBS false //causes insane amount of debug output
+#define BM1368_DEBUG_JOBS false //causes insane amount of debug output
 
 static const uint64_t BM1366_CORE_COUNT = 112;
 static const uint64_t BM1366_SMALL_CORE_COUNT = 894;
