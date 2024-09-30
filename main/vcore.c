@@ -26,10 +26,12 @@ uint8_t VCORE_init(GlobalState * global_state) {
     if (global_state->board_version == 402||global_state->board_version == 600) {
         result = TPS546_init(DEFAULT_CONFIG);
     }else if((global_state->board_version >= 300 && global_state->board_version < 400)
-                ||(global_state->board_version >= 700 && global_state->board_version < 900)){
+                ||(global_state->board_version >= 700 && global_state->board_version < 800)){
         result = TPS546_init(HEX_CONFIG);
+    }else if(global_state->board_version >= 800 && global_state->board_version < 900){
+        result = TPS546_init(GAMMAHEX_CONFIG);
     }
-    ADC_init();
+        ADC_init();
     return result;
 }
 

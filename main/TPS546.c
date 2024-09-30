@@ -411,7 +411,7 @@ int TPS546_init(TPS546_CONFIG config)
 
     /* Show switching frequency */
     TPS546_get_frequency();
-    TPS546_set_frequency(650);
+    //TPS546_set_frequency(650);
 
     /* Show voltage settings */
     TPS546_show_voltage_settings();
@@ -491,7 +491,8 @@ void TPS546_write_entire_config(void)
 
     /* Switch frequency */
     ESP_LOGI(TAG, "Setting FREQUENCY");
-    smb_write_word(PMBUS_FREQUENCY_SWITCH, int_2_slinear11(TPS546_INIT_FREQUENCY));
+    // smb_write_word(PMBUS_FREQUENCY_SWITCH, int_2_slinear11(_tps_config.TPS546_INIT_SW_FREQ));
+    TPS546_set_frequency(_tps_config.TPS546_INIT_SW_FREQ);
 
     /* vin voltage */
     ESP_LOGI(TAG, "Setting VIN");
@@ -525,8 +526,8 @@ void TPS546_write_entire_config(void)
 
     /* iout current */
     ESP_LOGI(TAG, "Setting IOUT");
-    smb_write_word(PMBUS_IOUT_OC_WARN_LIMIT, float_2_slinear11(TPS546_INIT_IOUT_OC_WARN_LIMIT));
-    smb_write_word(PMBUS_IOUT_OC_FAULT_LIMIT, float_2_slinear11(TPS546_INIT_IOUT_OC_FAULT_LIMIT));
+    smb_write_word(PMBUS_IOUT_OC_WARN_LIMIT, float_2_slinear11(_tps_config.TPS546_INIT_IOUT_OC_WARN_LIMIT));
+    smb_write_word(PMBUS_IOUT_OC_FAULT_LIMIT, float_2_slinear11(_tps_config.TPS546_INIT_IOUT_OC_FAULT_LIMIT));
     smb_write_byte(PMBUS_IOUT_OC_FAULT_RESPONSE, TPS546_INIT_IOUT_OC_FAULT_RESPONSE);
 
     /* temperature */

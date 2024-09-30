@@ -38,6 +38,13 @@ typedef struct
   const float TPS546_INIT_VOUT_UV_FAULT_LIMIT; /* %/100 below VOUT_COMMAND */
   const float TPS546_INIT_VOUT_MIN; /* v */
 
+   /* iout current */
+  const float TPS546_INIT_IOUT_OC_WARN_LIMIT;  /* A */
+  const float TPS546_INIT_IOUT_OC_FAULT_LIMIT; /* A */
+
+  /* SW Ferq */
+  const int TPS546_INIT_SW_FREQ;
+
 } TPS546_CONFIG;
 
 static TPS546_CONFIG DEFAULT_CONFIG = {
@@ -60,6 +67,13 @@ static TPS546_CONFIG DEFAULT_CONFIG = {
   .TPS546_INIT_VOUT_UV_WARN_LIMIT=0.9f,
   .TPS546_INIT_VOUT_UV_FAULT_LIMIT=0.75f,
   .TPS546_INIT_VOUT_MIN=1.0f,
+
+  /* iout current */
+  .TPS546_INIT_IOUT_OC_WARN_LIMIT=25,
+  .TPS546_INIT_IOUT_OC_FAULT_LIMIT=30,
+
+  /* SW Ferq */
+  .TPS546_INIT_SW_FREQ=650,
 
   };
 
@@ -84,6 +98,43 @@ static TPS546_CONFIG HEX_CONFIG = {
   .TPS546_INIT_VOUT_UV_FAULT_LIMIT=0.75f,
   .TPS546_INIT_VOUT_MIN=2.5f,
 
+  /* iout current */
+  .TPS546_INIT_IOUT_OC_WARN_LIMIT=25,
+  .TPS546_INIT_IOUT_OC_FAULT_LIMIT=30,
+
+  /* SW Ferq */
+  .TPS546_INIT_SW_FREQ=650,
+
+};
+
+static TPS546_CONFIG GAMMAHEX_CONFIG = {
+  .PROFILE = "TPS546 profile for GammaHex",
+  /* vin voltage */
+  .TPS546_INIT_VIN_ON=11.5f,
+  .TPS546_INIT_VIN_OFF=11.0f,
+  .TPS546_INIT_VIN_UV_WARN_LIMIT=11.0f,
+  .TPS546_INIT_VIN_OV_FAULT_LIMIT=14.0f,
+  .TPS546_INIT_VIN_OV_FAULT_RESPONSE=0xB7,
+  
+  /* vout voltage */
+  .TPS546_INIT_SCALE_LOOP=0.125f,
+  .TPS546_INIT_VOUT_MAX=4.50f,
+  .TPS546_INIT_VOUT_OV_FAULT_LIMIT=1.25f,
+  .TPS546_INIT_VOUT_OV_WARN_LIMIT=1.1f,
+  .TPS546_INIT_VOUT_MARGIN_HIGH=1.1f,
+  .TPS546_INIT_VOUT_COMMAND=3.60f,
+  .TPS546_INIT_VOUT_MARGIN_LOW=0.9f,
+  .TPS546_INIT_VOUT_UV_WARN_LIMIT=0.9f,
+  .TPS546_INIT_VOUT_UV_FAULT_LIMIT=0.75f,
+  .TPS546_INIT_VOUT_MIN=2.5f,
+
+  /* iout current */
+  .TPS546_INIT_IOUT_OC_WARN_LIMIT=38,
+  .TPS546_INIT_IOUT_OC_FAULT_LIMIT=40,
+
+  /* SW Ferq */
+  .TPS546_INIT_SW_FREQ=850,
+
 };
 
 /* vin voltage */
@@ -106,13 +157,13 @@ static TPS546_CONFIG HEX_CONFIG = {
 // #define TPS546_INIT_VOUT_MIN 1 /* v */
 
   /* iout current */
-#define TPS546_INIT_IOUT_OC_WARN_LIMIT  25.00 /* A */
-#define TPS546_INIT_IOUT_OC_FAULT_LIMIT 30.00 /* A */
+//#define TPS546_INIT_IOUT_OC_WARN_LIMIT  25.00 /* A */
+//#define TPS546_INIT_IOUT_OC_FAULT_LIMIT 30.00 /* A */
 #define TPS546_INIT_IOUT_OC_FAULT_RESPONSE 0xC0  /* shut down, no retries */
 
   /* temperature */
 // It is better to set the temperature warn limit for TPS546 more higher than Ultra 
-#define TPS546_INIT_OT_WARN_LIMIT  105 /* degrees C */
+#define TPS546_INIT_OT_WARN_LIMIT  135 /* degrees C */
 #define TPS546_INIT_OT_FAULT_LIMIT 145 /* degrees C */
 #define TPS546_INIT_OT_FAULT_RESPONSE 0xFF /* wait for cooling, and retry */
 
