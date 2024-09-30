@@ -55,6 +55,7 @@ static double automatic_fan_speed(float chip_temp, float vr_temp, GlobalState * 
     switch (GLOBAL_STATE->device_model)
     {
     case DEVICE_SUPRAHEX:
+    case DEVICE_GAMMAHEX:
     case DEVICE_GAMMA:
         throttleTemp = CHIP_THROTTLE_TEMP;
         break;
@@ -105,6 +106,7 @@ static double automatic_fan_speed(float chip_temp, float vr_temp, GlobalState * 
             break;
         case DEVICE_HEX:
         case DEVICE_SUPRAHEX:
+        case DEVICE_GAMMAHEX:
             EMC2302_set_fan_speed(0,perc);
             EMC2302_set_fan_speed(1,perc);
             break;
@@ -160,6 +162,7 @@ void POWER_MANAGEMENT_task(void * pvParameters)
         case DEVICE_GAMMA:
             break;
         case DEVICE_SUPRAHEX:
+        case DEVICE_GAMMAHEX:
             max6689_init();
             break;
         default:
@@ -188,6 +191,7 @@ void POWER_MANAGEMENT_task(void * pvParameters)
                 break;
             case DEVICE_HEX:
             case DEVICE_SUPRAHEX:
+            case DEVICE_GAMMAHEX:
                 power_management->voltage = TPS546_get_vin() * 1000;
                 power_management->current = TPS546_get_iout() * 1000;
                 power_management->power = (TPS546_get_vout() * power_management->current) / 1000 + HEX_POWER_OFFSET;
@@ -271,7 +275,8 @@ void POWER_MANAGEMENT_task(void * pvParameters)
                     break;
                 case DEVICE_HEX:
                 case DEVICE_SUPRAHEX:
-                    uint8_t temps[6] = {0,0,0,0,0,0};
+                case DEVICE_GAMMAHEX:
+                    //uint8_t temps[6] = {0,0,0,0,0,0};
                     //max6689_read_temp(temps);
                     //ESP_LOGI(TAG,"Diode Temp: [%d,%d,%d,%d,%d,%d]",temps[0],temps[1],temps[2],temps[3],temps[4],temps[5]);
 
@@ -318,6 +323,7 @@ void POWER_MANAGEMENT_task(void * pvParameters)
                     break;
                 case DEVICE_HEX:
                 case DEVICE_SUPRAHEX:
+                case DEVICE_GAMMAHEX:
                     fs = (float) nvs_config_get_u16(NVS_CONFIG_FAN_SPEED, 100);
                     //ESP_LOGI(TAG, "Manual Fan = %.02f", fs);
                     power_management->fan_perc = fs;

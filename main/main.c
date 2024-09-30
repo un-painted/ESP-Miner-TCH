@@ -67,6 +67,12 @@ void app_main(void)
         GLOBAL_STATE.asic_count = 1;
         GLOBAL_STATE.voltage_domain = 1;
         GLOBAL_STATE.has_chip_temp = true;
+    }else if (strcmp(GLOBAL_STATE.device_model_str, "gammahex") == 0) {
+        ESP_LOGI(TAG, "DEVICE: GammaHex");
+        GLOBAL_STATE.device_model = DEVICE_GAMMAHEX;
+        GLOBAL_STATE.asic_count = 6;
+        GLOBAL_STATE.voltage_domain = 3;
+        GLOBAL_STATE.has_chip_temp = true;
     } else {
         ESP_LOGE(TAG, "Invalid DEVICE model");
         // maybe should return here to now execute anything with a faulty device parameter !

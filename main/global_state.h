@@ -30,6 +30,7 @@ typedef enum
     DEVICE_HEX,
     DEVICE_SUPRAHEX,
     DEVICE_GAMMA,
+    DEVICE_GAMMAHEX,
 } DeviceModel;
 
 typedef enum

@@ -118,6 +118,7 @@ static void _init_system(GlobalState * GLOBAL_STATE)
             break;
         case DEVICE_HEX:
         case DEVICE_SUPRAHEX:
+        case DEVICE_GAMMAHEX:
             EMC2302_init(nvs_config_get_u16(NVS_CONFIG_INVERT_FAN_POLARITY, 1));
             break;
         default:
@@ -136,6 +137,7 @@ static void _init_system(GlobalState * GLOBAL_STATE)
         case DEVICE_ULTRA:
         case DEVICE_HEX:
         case DEVICE_SUPRAHEX:
+        case DEVICE_GAMMAHEX:
         case DEVICE_SUPRA:
         case DEVICE_GAMMA:
             // oled
@@ -173,6 +175,7 @@ static void _show_overheat_screen(GlobalState * GLOBAL_STATE)
         case DEVICE_SUPRAHEX:
         case DEVICE_SUPRA:
         case DEVICE_GAMMA:
+        case DEVICE_GAMMAHEX:
             if (OLED_status()) {
                 OLED_clearLine(0);
                 OLED_clearLine(1);
@@ -202,6 +205,7 @@ static void _update_hashrate(GlobalState * GLOBAL_STATE)
         case DEVICE_ULTRA:
         case DEVICE_HEX:
         case DEVICE_SUPRAHEX:
+        case DEVICE_GAMMAHEX:
         case DEVICE_SUPRA:
         case DEVICE_GAMMA:
             float efficiency = GLOBAL_STATE->POWER_MANAGEMENT_MODULE.power / (module->current_hashrate / 1000.0);
@@ -227,6 +231,7 @@ static void _update_shares(GlobalState * GLOBAL_STATE)
         case DEVICE_ULTRA:
         case DEVICE_HEX:
         case DEVICE_SUPRAHEX:
+        case DEVICE_GAMMAHEX:
         case DEVICE_SUPRA:
         case DEVICE_GAMMA:
             OLED_clearLine(1);
@@ -251,6 +256,7 @@ static void _update_best_diff(GlobalState * GLOBAL_STATE)
         case DEVICE_ULTRA:
         case DEVICE_HEX:
         case DEVICE_SUPRAHEX:
+        case DEVICE_GAMMAHEX:
         case DEVICE_SUPRA:
         case DEVICE_GAMMA:
             OLED_clearLine(3);
@@ -269,6 +275,7 @@ static void _clear_display(GlobalState * GLOBAL_STATE)
         case DEVICE_ULTRA:
         case DEVICE_HEX:
         case DEVICE_SUPRAHEX:
+        case DEVICE_GAMMAHEX:
         case DEVICE_SUPRA:
         case DEVICE_GAMMA:
             OLED_clearLine(0);
@@ -290,6 +297,7 @@ static void _update_system_info(GlobalState * GLOBAL_STATE)
         case DEVICE_ULTRA:
         case DEVICE_HEX:
         case DEVICE_SUPRAHEX:
+        case DEVICE_GAMMAHEX:
         case DEVICE_SUPRA:
         case DEVICE_GAMMA:
             if (OLED_status()) {
@@ -327,6 +335,7 @@ static void _update_esp32_info(GlobalState * GLOBAL_STATE)
         case DEVICE_ULTRA:
         case DEVICE_HEX:
         case DEVICE_SUPRAHEX:
+        case DEVICE_GAMMAHEX:
         case DEVICE_SUPRA:
         case DEVICE_GAMMA:
             if (OLED_status()) {
@@ -363,6 +372,7 @@ static void _init_connection(GlobalState * GLOBAL_STATE)
         case DEVICE_ULTRA:
         case DEVICE_HEX:
         case DEVICE_SUPRAHEX:
+        case DEVICE_GAMMAHEX:
         case DEVICE_SUPRA:
         case DEVICE_GAMMA:
             if (OLED_status()) {
@@ -384,6 +394,7 @@ static void _update_connection(GlobalState * GLOBAL_STATE)
         case DEVICE_ULTRA:
         case DEVICE_HEX:
         case DEVICE_SUPRAHEX:
+        case DEVICE_GAMMAHEX:
         case DEVICE_SUPRA:
         case DEVICE_GAMMA:
             if (OLED_status()) {
@@ -423,6 +434,7 @@ static void _update_system_performance(GlobalState * GLOBAL_STATE)
         case DEVICE_ULTRA:
         case DEVICE_HEX:
         case DEVICE_SUPRAHEX:
+        case DEVICE_GAMMAHEX:
         case DEVICE_SUPRA:
         case DEVICE_GAMMA:
             if (OLED_status()) {
@@ -447,6 +459,7 @@ static void show_ap_information(const char * error, GlobalState * GLOBAL_STATE)
         case DEVICE_ULTRA:
         case DEVICE_HEX:
         case DEVICE_SUPRAHEX:
+        case DEVICE_GAMMAHEX:
         case DEVICE_SUPRA:
         case DEVICE_GAMMA:
             if (OLED_status()) {
