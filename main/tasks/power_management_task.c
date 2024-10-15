@@ -171,7 +171,7 @@ void POWER_MANAGEMENT_task(void * pvParameters)
     vTaskDelay(4000 / portTICK_PERIOD_MS);
 
     while (1) {
-        //TPS546_check_status();
+        TPS546_check_status();
         auto_fan_speed = nvs_config_get_u16(NVS_CONFIG_AUTO_FAN_SPEED, 1);
         switch (GLOBAL_STATE->device_model) {
             case DEVICE_MAX:
