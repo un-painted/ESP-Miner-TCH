@@ -23,7 +23,7 @@ static const char *TAG = "vcore.c";
 
 uint8_t VCORE_init(GlobalState * global_state) {
     uint8_t result=0;
-    if (global_state->board_version == 402||global_state->board_version == 600) {
+    if (global_state->board_version >= 402&&global_state->board_version <= 699) {
         result = TPS546_init(DEFAULT_CONFIG);
     }else if((global_state->board_version >= 300 && global_state->board_version < 400)
                 ||(global_state->board_version >= 700 && global_state->board_version < 800)){
@@ -69,7 +69,7 @@ bool VCORE_set_voltage(float core_voltage, GlobalState * global_state)
         case DEVICE_MAX:
         case DEVICE_ULTRA:
         case DEVICE_SUPRA:
-            if (global_state->board_version == 402) {
+            if (global_state->board_version >= 402 && global_state->board_version <= 499) {
                 ESP_LOGI(TAG, "Set ASIC voltage = %.3fV", core_voltage);
                 TPS546_set_vout(core_voltage * (float)global_state->voltage_domain);
             } else {
