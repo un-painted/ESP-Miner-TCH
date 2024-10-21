@@ -7,6 +7,7 @@
 #include "esp_random.h"
 #include "esp_spiffs.h"
 #include "esp_timer.h"
+#include "esp_wifi.h"
 #include "esp_vfs.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/event_groups.h"
@@ -365,16 +366,23 @@ static esp_err_t GET_system_info(httpd_req_t * req)
         return ESP_FAIL;
     }
 
+
     char * ssid = nvs_config_get_string(NVS_CONFIG_WIFI_SSID, CONFIG_ESP_WIFI_SSID);
     char * hostname = nvs_config_get_string(NVS_CONFIG_HOSTNAME, CONFIG_LWIP_LOCAL_HOSTNAME);
+    uint8_t mac[6];
+    char formattedMac[18];
     char * stratumURL = nvs_config_get_string(NVS_CONFIG_STRATUM_URL, CONFIG_STRATUM_URL);
     char * stratumUser = nvs_config_get_string(NVS_CONFIG_STRATUM_USER, CONFIG_STRATUM_USER);
     char * board_version = nvs_config_get_string(NVS_CONFIG_BOARD_VERSION, "unknown");
     char * device_model_str = nvs_config_get_string(NVS_CONFIG_DEVICE_MODEL, "unknown");
 
-        cJSON * root = cJSON_CreateObject();
+    esp_wifi_get_mac(WIFI_IF_STA, mac);
+    snprintf(formattedMac, 18, "%02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+
+    cJSON * root = cJSON_CreateObject();
     cJSON_AddNumberToObject(root, "power", GLOBAL_STATE->POWER_MANAGEMENT_MODULE.power);
     cJSON_AddNumberToObject(root, "voltage", GLOBAL_STATE->POWER_MANAGEMENT_MODULE.voltage);
+    cJSON_AddStringToObject(root, "macAddr", formattedMac);
     cJSON_AddNumberToObject(root, "current", GLOBAL_STATE->POWER_MANAGEMENT_MODULE.current);
     cJSON_AddNumberToObject(root, "temp", GLOBAL_STATE->POWER_MANAGEMENT_MODULE.chip_temp_avg);
     cJSON_AddNumberToObject(root, "vrTemp", GLOBAL_STATE->POWER_MANAGEMENT_MODULE.vr_temp);
