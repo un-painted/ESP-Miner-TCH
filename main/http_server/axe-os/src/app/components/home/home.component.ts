@@ -62,7 +62,19 @@ export class HomeComponent {
           labels: {
             color: textColor
           }
-        }
+        },
+        tooltip: {
+          callbacks: {
+            label: function(tooltipItem: any) {
+              let label = tooltipItem.dataset.label || '';
+              if (label) {
+                label += ': ';
+              }
+              label += HashSuffixPipe.transform(tooltipItem.raw);
+              return label;
+            }
+          }
+        },
       },
       scales: {
         x: {
@@ -117,6 +129,7 @@ export class HomeComponent {
           ...this.chartData
         };
 
+
       }),
       map(info => {
         info.power = parseFloat(info.power.toFixed(1))
@@ -148,7 +161,7 @@ export class HomeComponent {
         } else if (info.stratumURL.includes('solo.d-central.tech')) {
           const address = info.stratumUser.split('.')[0]
           return `https://solo.d-central.tech/#/app/${address}`;
-        } else if (info.stratumURL.includes('solo.ckpool.org')) {
+        } else if (/solo[46]?.ckpool.org/.test(info.stratumURL)) {
           const address = info.stratumUser.split('.')[0]
           return `https://solostats.ckpool.org/users/${address}`;
         } else {
