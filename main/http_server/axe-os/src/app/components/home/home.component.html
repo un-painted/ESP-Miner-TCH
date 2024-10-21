@@ -1,13 +1,19 @@
 <ng-template #loading>
     <h4>Loading...</h4>
 </ng-template>
-<ng-container>
+<ng-container *ngIf="info$ | async as info; else loading">
+    <!-- Temp warning alert -->
+    <p-message *ngIf="info.overheat_mode" 
+        severity="error" 
+        styleClass="w-full mb-4 py-4 border-round-xl"
+        text="Bitaxe has overheated - See settings">
+    </p-message>
 
     <div class="grid" *ngIf="info$ | async as info; else loading">
         <div class="col-12">
             <div class="card">
                 <div class="grid mb-4">
-                    <div class="col-12 lg:col-6 xl:col-3">
+                    <div class="col-12 md:col-6 xl:col-3">
                         <div class="card mb-0">
                             <div class="flex justify-content-between mb-3">
                                 <div>
@@ -28,7 +34,7 @@
                             </ng-container>
                         </div>
                     </div>
-                    <div class="col-12 lg:col-6 xl:col-3">
+                    <div class="col-12 md:col-6 xl:col-3">
                         <div class="card mb-0">
                             <div class="flex justify-content-between mb-3">
                                 <div>
@@ -44,7 +50,7 @@
                             <span class="text-500">rejected</span>
                         </div>
                     </div>
-                    <div class="col-12 lg:col-6 xl:col-3">
+                    <div class="col-12 md:col-6 xl:col-3">
                         <div class="card mb-0">
                             <div class="flex justify-content-between mb-3">
                                 <div>
@@ -63,7 +69,7 @@
                             <span class="text-500">since last week</span> -->
                         </div>
                     </div>
-                    <div class="col-12 lg:col-6 xl:col-3">
+                    <div class="col-12 md:col-6 xl:col-3">
                         <div class="card mb-0">
                             <div class="flex justify-content-between mb-3">
                                 <div>

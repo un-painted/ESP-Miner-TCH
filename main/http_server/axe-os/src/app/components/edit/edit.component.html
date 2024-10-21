@@ -166,7 +166,7 @@
         </ng-container>
 
 
-        <div class="col-12 md:col-4">
+        <div class="col-12">
             <div class="field-checkbox">
                 <p-checkbox name="flipscreen" formControlName="flipscreen" inputId="flipscreen"
                     [binary]="true"></p-checkbox>
@@ -174,7 +174,7 @@
             </div>
         </div>
 
-        <div class="col-12 md:col-4">
+        <div class="col-12">
             <div class="field-checkbox">
                 <p-checkbox name="invertfanpolarity" formControlName="invertfanpolarity" inputId="invertfanpolarity"
                     [binary]="true"></p-checkbox>
@@ -188,14 +188,6 @@
                 <label for="autofanspeed">Automatic Fan Control</label>
             </div>
         </div>
-        
-        <div class="col-12 md:col-4" *ngIf="form.get('overheat_mode')?.value === 1">
-            <div class="field-checkbox">
-                <p-checkbox name="overheat_mode" formControlName="overheat_mode" inputId="overheat_mode"
-                    [binary]="true"></p-checkbox>
-                <label for="overheat_mode">Disable Overheat Mode. Make sure to reset Frequency and Voltage</label>
-            </div>
-        </div>
 
         <div *ngIf="form.controls['autofanspeed'].value != true">
             <div class="col-12" *ngIf="form.controls['autofanspeed'].value != true">
@@ -207,6 +199,15 @@
                 <p-slider formControlName="fanspeed"></p-slider>
             </div>
         </div>
+
+        <div class="col-12" *ngIf="form.get('overheat_mode')?.value === 1">
+            <div class="field-checkbox">
+                <p-checkbox name="overheat_mode" formControlName="overheat_mode" inputId="overheat_mode"
+                    [binary]="true"></p-checkbox>
+                <label for="overheat_mode" style="color: #ff0000;">Disable Overheat Mode. Make sure to reset Frequency and Voltage</label>
+            </div>
+        </div>
+        
         <div class="mt-2">
             <button pButton [disabled]="form.invalid" (click)="updateSystem()"
                 class="btn btn-primary mr-2">Save</button>

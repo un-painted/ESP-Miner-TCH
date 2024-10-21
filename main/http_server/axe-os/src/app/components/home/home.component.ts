@@ -45,8 +45,9 @@ export class HomeComponent {
           fill: false,
           backgroundColor: primaryColor,
           borderColor: primaryColor,
-          tension: .4,
-          pointRadius: 1,
+          tension: 0,
+          pointRadius: 2,
+          pointHoverRadius: 5,
           borderWidth: 1
         },
 
