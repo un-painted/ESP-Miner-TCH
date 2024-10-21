@@ -168,6 +168,8 @@ void SYSTEM_update_overheat_mode(GlobalState * GLOBAL_STATE)
 
 static void _show_overheat_screen(GlobalState * GLOBAL_STATE)
 {
+    SystemModule * module = &GLOBAL_STATE->SYSTEM_MODULE;
+    
     switch (GLOBAL_STATE->device_model) {
         case DEVICE_MAX:
         case DEVICE_ULTRA:
