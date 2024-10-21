@@ -6,6 +6,8 @@
 #include "esp_log.h"
 #include "nvs_config.h"
 #include "utils.h"
+#include "stratum_task.h"
+#include <lwip/tcpip.h>
 
 static const char *TAG = "asic_result";
 
@@ -17,7 +19,6 @@ void ASIC_result_task(void *pvParameters)
 
     while (1)
     {
-
         task_result *asic_result = (*GLOBAL_STATE->ASIC_functions.receive_result_fn)(GLOBAL_STATE);
 
         if (asic_result == NULL)
@@ -47,7 +48,7 @@ void ASIC_result_task(void *pvParameters)
         if (nonce_diff > pool_difficulty)
         {
 
-            STRATUM_V1_submit_share(
+            int ret = STRATUM_V1_submit_share(
                 GLOBAL_STATE->sock,
                 user,
                 GLOBAL_STATE->ASIC_TASK_MODULE.active_jobs[job_id]->jobid,
@@ -56,6 +57,11 @@ void ASIC_result_task(void *pvParameters)
                 asic_result->nonce,
                 asic_result->rolled_version ^ GLOBAL_STATE->ASIC_TASK_MODULE.active_jobs[job_id]->version);
 
+            if (ret < 0) {
+                ESP_LOGI(TAG, "Unable to write share to socket. Closing connection. Ret: %d (errno %d: %s)", ret, errno, strerror(errno));
+                stratum_close_connection(GLOBAL_STATE);
+            }
+            
             SYSTEM_notify_found_nonce(GLOBAL_STATE, (double) pool_difficulty);
         }
         SYSTEM_check_for_best_diff(GLOBAL_STATE, nonce_diff, job_id);

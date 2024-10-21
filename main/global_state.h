@@ -16,6 +16,7 @@
 #include "work_queue.h"
 
 #define STRATUM_USER CONFIG_STRATUM_USER
+#define FALLBACK_STRATUM_USER CONFIG_FALLBACK_STRATUM_USER
 
 // best is power of 2 for ring buffers
 #define HISTORY_LENGTH 512
@@ -72,9 +73,11 @@ typedef struct
     char ssid[32];
     char wifi_status[20];
     char * pool_url;
+    char * fallback_pool_url;
     uint16_t pool_port;
+    uint16_t fallback_pool_port;
+    bool is_using_fallback;
     uint16_t overheat_mode;
-
     uint32_t lastClockSync;
 } SystemModule;
 
