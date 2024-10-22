@@ -639,29 +639,26 @@ void TPS546_print_status(void) {
     uint16_t u16_value;
     uint8_t u8_value;
 
-    ESP_LOGE(TAG, "IOut: %.2f; VOut: %.2f, Vint: %.2f, freq: %d", TPS546_get_iout(), TPS546_get_vout(), TPS546_get_vin(),TPS546_get_frequency());
-
     if (smb_read_word(PMBUS_STATUS_WORD, &u16_value) != ESP_OK) {
         ESP_LOGE(TAG, "Could not read STATUS_WORD");
-    } else {
+    } 
+    
+    if(u16_value!=0x0000&&!(u16_value&PMBUS_FAULT_CML)){
+
+        ESP_LOGE(TAG, "IOut: %.2f; VOut: %.2f, Vint: %.2f, freq: %d", TPS546_get_iout(), TPS546_get_vout(), TPS546_get_vin(),TPS546_get_frequency());
         ESP_LOGI(TAG, "TPS546 Status: %04X", u16_value);
-        if (u16_value & PMBUS_FAULT_VIN_UV) {
-            ESP_LOGI(TAG, "Vin Undervoltage");
+        if (smb_read_byte(PMBUS_STATUS_VOUT, &u8_value) != ESP_OK) {
+        ESP_LOGE(TAG, "Could not read STATUS_VOUT");
+        } else {
+            ESP_LOGI(TAG, "TPS546 VOUT Status: %02X", u8_value);
+        }
+
+        if (smb_read_byte(PMBUS_STATUS_INPUT, &u8_value) != ESP_OK) {
+            ESP_LOGE(TAG, "Could not read STATUS_INPUT");
+        } else {
+            ESP_LOGI(TAG, "TPS546 INPUT Status: %02X", u8_value);
         }
     }
-
-    if (smb_read_byte(PMBUS_STATUS_VOUT, &u8_value) != ESP_OK) {
-        ESP_LOGE(TAG, "Could not read STATUS_VOUT");
-    } else {
-        ESP_LOGI(TAG, "TPS546 VOUT Status: %02X", u8_value);
-    }
-
-    if (smb_read_byte(PMBUS_STATUS_INPUT, &u8_value) != ESP_OK) {
-        ESP_LOGE(TAG, "Could not read STATUS_INPUT");
-    } else {
-        ESP_LOGI(TAG, "TPS546 INPUT Status: %02X", u8_value);
-    }
-
     
 }
 

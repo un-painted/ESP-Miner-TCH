@@ -1,4 +1,3 @@
-#include "system.h"
 #include <inttypes.h>
 #include <math.h>
 #include <stdint.h>
@@ -22,7 +21,6 @@
 #include "system.h"
 #include "i2c_bitaxe.h"
 #include "EMC2101.h"
-#include "EMC2302.h"
 #include "INA260.h"
 #include "adc.h"
 #include "connect.h"
@@ -30,6 +28,7 @@
 #include "nvs_config.h"
 #include "oled.h"
 #include "vcore.h"
+
 
 static const char * TAG = "SystemModule";
 
@@ -56,10 +55,9 @@ void SYSTEM_init_system(GlobalState * GLOBAL_STATE)
 {
     SystemModule * module = &GLOBAL_STATE->SYSTEM_MODULE;
 
+    module->duration_start = 0;
     module->historical_hashrate_rolling_index = 0;
-    memset(module->historical_hashrate, 0, sizeof(module->historical_hashrate));
-    memset(module->historical_hashrate_time_stamps, 0, sizeof(module->historical_hashrate_time_stamps));
-
+    module->historical_hashrate_init = 0;
     module->current_hashrate = 0;
     module->screen_page = 0;
     module->shares_accepted = 0;
@@ -70,7 +68,7 @@ void SYSTEM_init_system(GlobalState * GLOBAL_STATE)
     module->lastClockSync = 0;
     module->FOUND_BLOCK = false;
     module->startup_done = false;
-
+    
     // set the pool url
     module->pool_url = nvs_config_get_string(NVS_CONFIG_STRATUM_URL, CONFIG_STRATUM_URL);
     module->fallback_pool_url = nvs_config_get_string(NVS_CONFIG_FALLBACK_STRATUM_URL, CONFIG_FALLBACK_STRATUM_URL);
@@ -103,17 +101,13 @@ void SYSTEM_init_peripherals(GlobalState * GLOBAL_STATE) {
     VCORE_init(GLOBAL_STATE);
     VCORE_set_voltage(nvs_config_get_u16(NVS_CONFIG_ASIC_VOLTAGE, CONFIG_ASIC_VOLTAGE) / 1000.0, GLOBAL_STATE);
 
+    //init the EMC2101, if we have one
     switch (GLOBAL_STATE->device_model) {
         case DEVICE_MAX:
         case DEVICE_ULTRA:
         case DEVICE_SUPRA:
         case DEVICE_GAMMA:
             EMC2101_init(nvs_config_get_u16(NVS_CONFIG_INVERT_FAN_POLARITY, 1));
-            break;
-        case DEVICE_HEX:
-        case DEVICE_SUPRAHEX:
-        case DEVICE_GAMMAHEX:
-            EMC2302_init(nvs_config_get_u16(NVS_CONFIG_INVERT_FAN_POLARITY, 1));
             break;
         default:
     }
@@ -140,12 +134,10 @@ void SYSTEM_init_peripherals(GlobalState * GLOBAL_STATE) {
         ESP_LOGE(TAG, "Failed to ensure overheat_mode config");
     }
 
+    //Init the OLED
     switch (GLOBAL_STATE->device_model) {
         case DEVICE_MAX:
         case DEVICE_ULTRA:
-        case DEVICE_HEX:
-        case DEVICE_SUPRAHEX:
-        case DEVICE_GAMMAHEX:
         case DEVICE_SUPRA:
         case DEVICE_GAMMA:
             // oled
@@ -168,8 +160,6 @@ void SYSTEM_init_peripherals(GlobalState * GLOBAL_STATE) {
     _init_connection(GLOBAL_STATE);
 }
 
-
-
 void SYSTEM_task(void * pvParameters)
 {
     GlobalState * GLOBAL_STATE = (GlobalState *) pvParameters;
@@ -190,7 +180,7 @@ void SYSTEM_task(void * pvParameters)
         _update_connection(GLOBAL_STATE);
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
-
+    
     int current_screen = 0;
     TickType_t last_update_time = xTaskGetTickCount();
 
@@ -240,14 +230,18 @@ void SYSTEM_task(void * pvParameters)
         }
 
         last_update_time = xTaskGetTickCount();
-    }   
+    
+        
+    }
 }
+
+
 
 void SYSTEM_update_overheat_mode(GlobalState * GLOBAL_STATE)
 {
     SystemModule * module = &GLOBAL_STATE->SYSTEM_MODULE;
     uint16_t new_overheat_mode = nvs_config_get_u16(NVS_CONFIG_OVERHEAT_MODE, 0);
-
+    
     if (new_overheat_mode != module->overheat_mode) {
         module->overheat_mode = new_overheat_mode;
         ESP_LOGI(TAG, "Overheat mode updated to: %d", module->overheat_mode);
@@ -326,6 +320,7 @@ void SYSTEM_notify_found_nonce(GlobalState * GLOBAL_STATE, double found_diff, ui
         module->current_hashrate = ((module->current_hashrate * 9) + rolling_rate) / 10;
     }
 
+
     // logArrayContents(historical_hashrate, HISTORY_LENGTH);
     // logArrayContents(historical_hashrate_time_stamps, HISTORY_LENGTH);
 
@@ -344,11 +339,8 @@ static void _show_overheat_screen(GlobalState * GLOBAL_STATE)
     switch (GLOBAL_STATE->device_model) {
         case DEVICE_MAX:
         case DEVICE_ULTRA:
-        case DEVICE_HEX:
-        case DEVICE_SUPRAHEX:
         case DEVICE_SUPRA:
         case DEVICE_GAMMA:
-        case DEVICE_GAMMAHEX:
             if (OLED_status()) {
                 OLED_clearLine(0);
                 OLED_writeString(0, 0, "DEVICE OVERHEAT!");
@@ -374,17 +366,14 @@ static void _update_screen_one(GlobalState * GLOBAL_STATE)
 {
     SystemModule * module = &GLOBAL_STATE->SYSTEM_MODULE;
     PowerManagementModule * power_management = &GLOBAL_STATE->POWER_MANAGEMENT_MODULE;
-
     switch (GLOBAL_STATE->device_model) {
         case DEVICE_MAX:
         case DEVICE_ULTRA:
-        case DEVICE_HEX:
-        case DEVICE_SUPRAHEX:
-        case DEVICE_GAMMAHEX:
         case DEVICE_SUPRA:
         case DEVICE_GAMMA:
             if (OLED_status()) {
                 float efficiency = GLOBAL_STATE->POWER_MANAGEMENT_MODULE.power / (module->current_hashrate / 1000.0);
+
                 memset(module->oled_buf, 0, 20);
                 snprintf(module->oled_buf, 20, "Gh/s: %.2f", module->current_hashrate);
                 OLED_writeString(0, 0, module->oled_buf);
@@ -403,6 +392,7 @@ static void _update_screen_one(GlobalState * GLOBAL_STATE)
             }
             break;
         default:
+            break;
     }
 }
 
@@ -414,13 +404,11 @@ static void _update_screen_two(GlobalState * GLOBAL_STATE)
     switch (GLOBAL_STATE->device_model) {
         case DEVICE_MAX:
         case DEVICE_ULTRA:
-        case DEVICE_HEX:
-        case DEVICE_SUPRAHEX:
-        case DEVICE_GAMMAHEX:
         case DEVICE_SUPRA:
         case DEVICE_GAMMA:
             if (OLED_status()) {
-                 // Pool URL
+                // Pool URL
+                OLED_writeString(0, 0, "Mining URL:");
                 memset(module->oled_buf, 0, 20);
                 if (module->is_using_fallback) {
                 snprintf(module->oled_buf, 20, "%.19s", module->fallback_pool_url);
@@ -428,6 +416,14 @@ static void _update_screen_two(GlobalState * GLOBAL_STATE)
                     snprintf(module->oled_buf, 20, "%.19s", module->pool_url);
                 }
                 OLED_writeString(0, 1, module->oled_buf);
+                // // Second line of pool URL
+                // memset(module->oled_buf, 0, 20);
+                // if (module->is_using_fallback) {
+                // snprintf(module->oled_buf, 20, "%.19s", module->fallback_pool_url + 13);
+                // } else {
+                //     snprintf(module->oled_buf, 20, "%.19s", module->pool_url + 13);
+                // }
+                // OLED_writeString(0, 1, module->oled_buf);
 
                 // IP Address
                 OLED_writeString(0, 2, "Bitaxe IP:");
@@ -468,9 +464,6 @@ static void _init_connection(GlobalState * GLOBAL_STATE)
     switch (GLOBAL_STATE->device_model) {
         case DEVICE_MAX:
         case DEVICE_ULTRA:
-        case DEVICE_HEX:
-        case DEVICE_SUPRAHEX:
-        case DEVICE_GAMMAHEX:
         case DEVICE_SUPRA:
         case DEVICE_GAMMA:
             if (OLED_status()) {
@@ -490,9 +483,6 @@ static void _update_connection(GlobalState * GLOBAL_STATE)
     switch (GLOBAL_STATE->device_model) {
         case DEVICE_MAX:
         case DEVICE_ULTRA:
-        case DEVICE_HEX:
-        case DEVICE_SUPRAHEX:
-        case DEVICE_GAMMAHEX:
         case DEVICE_SUPRA:
         case DEVICE_GAMMA:
             if (OLED_status()) {
@@ -500,7 +490,7 @@ static void _update_connection(GlobalState * GLOBAL_STATE)
                 strncpy(module->oled_buf, module->ssid, sizeof(module->oled_buf));
                 module->oled_buf[sizeof(module->oled_buf) - 1] = 0;
                 OLED_writeString(0, 1, module->oled_buf);
-
+                
                 memset(module->oled_buf, 0, 20);
                 snprintf(module->oled_buf, 20, "Configuration SSID:");
                 OLED_writeString(0, 2, module->oled_buf);
@@ -516,14 +506,12 @@ static void _update_connection(GlobalState * GLOBAL_STATE)
     }
 }
 
+
 static void show_ap_information(const char * error, GlobalState * GLOBAL_STATE)
 {
     switch (GLOBAL_STATE->device_model) {
         case DEVICE_MAX:
         case DEVICE_ULTRA:
-        case DEVICE_HEX:
-        case DEVICE_SUPRAHEX:
-        case DEVICE_GAMMAHEX:
         case DEVICE_SUPRA:
         case DEVICE_GAMMA:
             if (OLED_status()) {
@@ -635,10 +623,6 @@ static void _suffix_string(uint64_t val, char * buf, size_t bufsiz, int sigdigit
 
         snprintf(buf, bufsiz, "%*.*f%s", sigdigits + 1, ndigits, dval, suffix);
     }
-}
-
-void SYSTEM_check_for_best_diff(GlobalState * GLOBAL_STATE, double found_diff, uint8_t job_id) {
-    _check_for_best_diff(GLOBAL_STATE, found_diff, job_id);
 }
 
 static esp_err_t ensure_overheat_mode_config() {

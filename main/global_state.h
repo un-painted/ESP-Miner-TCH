@@ -19,7 +19,7 @@
 #define FALLBACK_STRATUM_USER CONFIG_FALLBACK_STRATUM_USER
 
 // best is power of 2 for ring buffers
-#define HISTORY_LENGTH 512
+#define HISTORY_LENGTH 100
 #define DIFF_STRING_SIZE 10
 
 typedef enum
