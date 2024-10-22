@@ -31,7 +31,6 @@ uint8_t VCORE_init(GlobalState * global_state) {
     }else if(global_state->board_version >= 800 && global_state->board_version < 900){
         result = TPS546_init(GAMMAHEX_CONFIG);
     }
-        ADC_init();
     return result;
 }
 
