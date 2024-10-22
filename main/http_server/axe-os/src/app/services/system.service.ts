@@ -49,6 +49,7 @@ export class SystemService {
           fallbackStratumURL: "test.public-pool.io",
           fallbackStratumUser: "bc1q99n3pu025yyu0jlywpmwzalyhm36tg5u37w20d.bitaxe-U1",
           fallbackStratumPort: 21497,
+          isUsingFallbackStratum: true,
           frequency: 485,
           version: "2.0",
           boardVersion: "204",
