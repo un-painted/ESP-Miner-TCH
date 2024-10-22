@@ -639,6 +639,8 @@ void TPS546_print_status(void) {
     uint16_t u16_value;
     uint8_t u8_value;
 
+    ESP_LOGE(TAG, "IOut: %.2f; VOut: %.2f, Vint: %.2f, freq: %d", TPS546_get_iout(), TPS546_get_vout(), TPS546_get_vin(),TPS546_get_frequency());
+
     if (smb_read_word(PMBUS_STATUS_WORD, &u16_value) != ESP_OK) {
         ESP_LOGE(TAG, "Could not read STATUS_WORD");
     } else {
