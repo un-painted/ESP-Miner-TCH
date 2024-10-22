@@ -161,9 +161,12 @@ void POWER_MANAGEMENT_task(void * pvParameters)
             break;
         case DEVICE_GAMMA:
             break;
+        case DEVICE_HEX:
         case DEVICE_SUPRAHEX:
         case DEVICE_GAMMAHEX:
             //max6689_init();
+            TMP1075_init();
+            EMC2302_init(true);
             break;
         default:
     }
