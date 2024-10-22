@@ -73,10 +73,9 @@ typedef enum
     EMC2302_RATE_32_HZ,   ///< 32_HZ
 } emc2302_rate_t;
 
-void EMC2302_init(bool);
 void EMC2302_set_fan_speed(uint8_t, float);
 uint16_t EMC2302_get_fan_speed(uint8_t);
-
+esp_err_t EMC2302_init(bool);
 float EMC2302_get_external_temp(void);
 uint8_t EMC2302_get_internal_temp(void);
 

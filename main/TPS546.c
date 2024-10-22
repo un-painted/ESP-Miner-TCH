@@ -445,7 +445,7 @@ void TPS546_set_mfr_info(void)
 /* Set all the relevant config registers for normal operation */
 void TPS546_write_entire_config(void)
 {
-    ESP_LOGI(TAG, "---Writing new config values to %s---",_tps_config.PROFILE);
+    ESP_LOGI(TAG, "--- Writing new config values to %s ---",_tps_config.PROFILE);
     /* set up the ON_OFF_CONFIG */
     ESP_LOGI(TAG, "Setting ON_OFF_CONFIG");
     if (smb_write_byte(PMBUS_ON_OFF_CONFIG, TPS546_INIT_ON_OFF_CONFIG) != ESP_OK) {
@@ -643,6 +643,9 @@ void TPS546_print_status(void) {
         ESP_LOGE(TAG, "Could not read STATUS_WORD");
     } else {
         ESP_LOGI(TAG, "TPS546 Status: %04X", u16_value);
+        if (u16_value & PMBUS_FAULT_VIN_UV) {
+            ESP_LOGI(TAG, "Vin Undervoltage");
+        }
     }
 
     if (smb_read_byte(PMBUS_STATUS_VOUT, &u8_value) != ESP_OK) {
@@ -656,6 +659,8 @@ void TPS546_print_status(void) {
     } else {
         ESP_LOGI(TAG, "TPS546 INPUT Status: %02X", u8_value);
     }
+
+    
 }
 
 /**

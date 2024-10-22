@@ -1,7 +1,6 @@
-#include "driver/i2c.h"
 #include "esp_log.h"
 #include <stdio.h>
-
+#include "i2c_bitaxe.h"
 #include "EMC2302.h"
 
 #define I2C_MASTER_SCL_IO 48 /*!< GPIO number used for I2C master clock */
@@ -14,35 +13,20 @@
 
 static const char *TAG = "EMC2302.c";
 
-/**
- * @brief Read a sequence of I2C bytes
- */
-static esp_err_t register_read(uint8_t reg_addr, uint8_t * data, size_t len)
-{
-    return i2c_master_write_read_device(I2C_MASTER_NUM, EMC2302_I2CADDR_DEFAULT, &reg_addr, 1, data, len,
-                                        I2C_MASTER_TIMEOUT_MS / portTICK_PERIOD_MS);
-}
+// run this first. sets up the config register
+static i2c_master_dev_handle_t emc2302_dev_handle;
 
-/**
- * @brief Write a byte to a I2C register
- */
-static esp_err_t register_write_byte(uint8_t reg_addr, uint8_t data)
-{
-    int ret;
-    uint8_t write_buf[2] = {reg_addr, data};
-
-    ret = i2c_master_write_to_device(I2C_MASTER_NUM, EMC2302_I2CADDR_DEFAULT, write_buf, sizeof(write_buf),
-                                     I2C_MASTER_TIMEOUT_MS / portTICK_PERIOD_MS);
-
-    return ret;
-}
-
-// run this first. sets up the PWM polarity register
-void EMC2302_init(bool invertPolarity)
-{
-    if (invertPolarity) {
-        ESP_ERROR_CHECK(register_write_byte(EMC2302_PWM_POLARITY, 0b00011111));
+esp_err_t EMC2302_init(bool invertPolarity) {
+    if (i2c_bitaxe_add_device(EMC2302_I2CADDR_DEFAULT, &emc2302_dev_handle) != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to add device");
+        return ESP_FAIL;
     }
+
+    if (invertPolarity) {
+        ESP_ERROR_CHECK(i2c_bitaxe_register_write_byte(emc2302_dev_handle, EMC2302_PWM_POLARITY, 0b00011111));
+    }
+
+    return ESP_OK;
 }
 
 // Sets the fan speed to a given percent
@@ -52,7 +36,7 @@ void EMC2302_set_fan_speed(uint8_t devicenum, float percent)
 	uint8_t FAN_SETTING_REG = EMC2302_FAN1_SETTING + (devicenum * 0x10);
 
     speed = (uint8_t) (255.0 * (1.0f-percent));
-    ESP_ERROR_CHECK(register_write_byte(FAN_SETTING_REG, speed));
+    ESP_ERROR_CHECK(i2c_bitaxe_register_write_byte(emc2302_dev_handle,FAN_SETTING_REG, speed));
 }
 
 // Gets the fan speed
@@ -63,8 +47,8 @@ uint16_t EMC2302_get_fan_speed(uint8_t devicenum)
     uint8_t TACH_LSB_REG = EMC2302_TACH1_LSB + (devicenum * 0x10);
     uint8_t TACH_MSB_REG = EMC2302_TACH1_MSB + (devicenum * 0x10);
 
-    ESP_ERROR_CHECK(register_read(TACH_LSB_REG, &tach_lsb, 1));
-    ESP_ERROR_CHECK(register_read(TACH_MSB_REG, &tach_msb, 1));
+    ESP_ERROR_CHECK(i2c_bitaxe_register_read(emc2302_dev_handle,TACH_LSB_REG, &tach_lsb, 1));
+    ESP_ERROR_CHECK(i2c_bitaxe_register_read(emc2302_dev_handle,TACH_MSB_REG, &tach_msb, 1));
 
     //ESP_LOGI(TAG, "Raw Fan Speed[%d] = %02X %02X", devicenum, tach_msb, tach_lsb);
     RPM = (tach_msb << 5) + ((tach_lsb >> 3) & 0x1F);
