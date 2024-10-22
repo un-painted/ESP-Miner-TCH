@@ -237,7 +237,7 @@ void POWER_MANAGEMENT_task(void * pvParameters)
                 case DEVICE_SUPRA:
                 case DEVICE_GAMMA:
                     double chipMaxTemp = BOARD_MAX_TEMP;   //Chip throttle temp; 
-					if (GLOBAL_STATE->board_version == 402||GLOBAL_STATE->board_version == 600) {
+					if (GLOBAL_STATE->board_version >= 402&&GLOBAL_STATE->board_version <= 699) {
                         power_management->chip_temp_avg = GLOBAL_STATE->asic_ready?EMC2101_get_external_temp():0;
 						power_management->vr_temp = (float)TPS546_get_temperature();
                         chipMaxTemp = CHIP_MAX_TEMP;
