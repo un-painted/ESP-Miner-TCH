@@ -24,6 +24,7 @@ export class AppMenuComponent implements OnInit {
                 items: [
                     { label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/'] },
                     { label: 'Swarm', icon: 'pi pi-fw pi-share-alt', routerLink: ['swarm'] },
+                    { label: 'Network', icon: 'pi pi-fw pi-wifi', routerLink: ['network'] },
                     { label: 'Settings', icon: 'pi pi-fw pi-cog', routerLink: ['settings'] },
                     { label: 'Logs', icon: 'pi pi-fw pi-list', routerLink: ['logs'] },
 
@@ -32,8 +33,6 @@ export class AppMenuComponent implements OnInit {
 
         ];
     }
-
-
 
     public restart() {
         this.systemService.restart().subscribe(res => {
