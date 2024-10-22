@@ -446,13 +446,13 @@ static void _reset(void)
     vTaskDelay(100 / portTICK_PERIOD_MS);
 }
 
-static void _send_read_address(void)
-{
+// static void _send_read_address(void)
+// {
 
-    unsigned char read_address[2] = {0x00, 0x00};
-    // send serial data
-    _send_BM1370((TYPE_CMD | GROUP_ALL | CMD_READ), read_address, 2, false);
-}
+//     unsigned char read_address[2] = {0x00, 0x00};
+//     // send serial data
+//     _send_BM1370((TYPE_CMD | GROUP_ALL | CMD_READ), read_address, 2, false);
+// }
 
 uint8_t BM1370_init(uint64_t frequency, uint16_t asic_count)
 {
@@ -547,7 +547,7 @@ void BM1370_send_work(void * pvParameters, bm_job * next_bm_job)
     //ESP_LOGI(TAG, "Send Job: %02X", job.job_id);
     pthread_mutex_unlock(&GLOBAL_STATE->valid_jobs_lock);
 
-    _send_BM1370((TYPE_JOB | GROUP_SINGLE | CMD_WRITE), &job, sizeof(BM1370_job), false);
+    _send_BM1370((TYPE_JOB | GROUP_SINGLE | CMD_WRITE), (uint8_t *)&job, sizeof(BM1370_job), BM1370_DEBUG_WORK);
 }
 
 asic_result * BM1370_receive_work(void)

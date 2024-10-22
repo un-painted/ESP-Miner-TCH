@@ -14,7 +14,7 @@
 #include "TPS546.h"
 #include "vcore.h"
 #include <string.h>
-#include "max6689.h"
+//#include "max6689.h"
 
 #define POLL_RATE 2000
 #define BOARD_MAX_TEMP 90.0
@@ -31,15 +31,15 @@
 
 static const char * TAG = "power_management";
 
-static float _fbound(float value, float lower_bound, float upper_bound)
-{
-    if (value < lower_bound)
-        return lower_bound;
-    if (value > upper_bound)
-        return upper_bound;
+// static float _fbound(float value, float lower_bound, float upper_bound)
+// {
+//     if (value < lower_bound)
+//         return lower_bound;
+//     if (value > upper_bound)
+//         return upper_bound;
 
-    return value;
-}
+//     return value;
+// }
 
 // Set the fan speed between 45% min and 100% max based on chip temperature as input.
 // The fan speed increases from 45% to 100% proportionally to the temperature increase from 50 and THROTTLE_TEMP
@@ -126,9 +126,9 @@ void POWER_MANAGEMENT_task(void * pvParameters)
     power_management->HAS_POWER_EN = GLOBAL_STATE->board_version == 202 || GLOBAL_STATE->board_version == 203 || GLOBAL_STATE->board_version == 204;
     power_management->HAS_PLUG_SENSE = GLOBAL_STATE->board_version == 204;
 
-    int last_frequency_increase = 0;
+    //int last_frequency_increase = 0;
 
-    uint16_t frequency_target = nvs_config_get_u16(NVS_CONFIG_ASIC_FREQ, CONFIG_ASIC_FREQUENCY);
+    //uint16_t frequency_target = nvs_config_get_u16(NVS_CONFIG_ASIC_FREQ, CONFIG_ASIC_FREQUENCY);
 
     uint16_t auto_fan_speed = nvs_config_get_u16(NVS_CONFIG_AUTO_FAN_SPEED, 1);
 
@@ -163,15 +163,15 @@ void POWER_MANAGEMENT_task(void * pvParameters)
             break;
         case DEVICE_SUPRAHEX:
         case DEVICE_GAMMAHEX:
-            max6689_init();
+            //max6689_init();
             break;
         default:
     }
 
-    vTaskDelay(4000 / portTICK_PERIOD_MS);
+    vTaskDelay(500 / portTICK_PERIOD_MS);
 
     while (1) {
-        TPS546_check_status();
+        TPS546_print_status();
         auto_fan_speed = nvs_config_get_u16(NVS_CONFIG_AUTO_FAN_SPEED, 1);
         switch (GLOBAL_STATE->device_model) {
             case DEVICE_MAX:
