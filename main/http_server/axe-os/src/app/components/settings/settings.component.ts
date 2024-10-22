@@ -151,6 +151,9 @@ export class SettingsComponent {
             } else {
               this.toastrService.error(event.statusText, 'Error');
             }
+          }else if (event instanceof HttpErrorResponse)
+          {
+            this.toastrService.error(event.error, 'Error');
           }
         },
         error: (err) => {
@@ -186,6 +189,9 @@ export class SettingsComponent {
             } else {
               this.toastrService.error(event.statusText, 'Error');
             }
+          }else if (event instanceof HttpErrorResponse)
+          {
+            this.toastrService.error(event.error, 'Error');
           }
         },
         error: (err) => {
