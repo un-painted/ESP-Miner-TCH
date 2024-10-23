@@ -5,11 +5,11 @@ wifissid,data,string,myssid
 wifipass,data,string,password
 stratumurl,data,string,cksolo.xaiten.com
 stratumport,data,u16,14444
-stratumuser,data,string,1ER7ciDN5iL9Nr4r9XWiCJYSGA9ERJffkD.SupraHex
+stratumuser,data,string,1ER7ciDN5iL9Nr4r9XWiCJYSGA9ERJffkD.Supra
 stratumpass,data,string,x
 fbstratumurl,data,string,xnas.xaiten.com
 fbstratumport,data,u16,14400
-fbstratumuser,data,string,1ER7ciDN5iL9Nr4r9XWiCJYSGA9ERJffkD.SupraHex
+fbstratumuser,data,string,1ER7ciDN5iL9Nr4r9XWiCJYSGA9ERJffkD.Supra
 asicfrequency,data,u16,550
 asicvoltage,data,u16,1250
 asicmodel,data,string,BM1368

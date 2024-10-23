@@ -174,13 +174,13 @@ void POWER_MANAGEMENT_task(void * pvParameters)
     vTaskDelay(500 / portTICK_PERIOD_MS);
 
     while (1) {
-        TPS546_print_status();
         auto_fan_speed = nvs_config_get_u16(NVS_CONFIG_AUTO_FAN_SPEED, 1);
         switch (GLOBAL_STATE->device_model) {
             case DEVICE_MAX:
             case DEVICE_ULTRA:
             case DEVICE_SUPRA:
 				if (GLOBAL_STATE->board_version >= 402 && GLOBAL_STATE->board_version <= 499) {
+                    TPS546_print_status();
                     power_management->voltage = TPS546_get_vin() * 1000;
                     power_management->current = TPS546_get_iout() * 1000;
                     // calculate regulator power (in milliwatts)
@@ -195,11 +195,13 @@ void POWER_MANAGEMENT_task(void * pvParameters)
             case DEVICE_HEX:
             case DEVICE_SUPRAHEX:
             case DEVICE_GAMMAHEX:
+                TPS546_print_status();
                 power_management->voltage = TPS546_get_vin() * 1000;
                 power_management->current = TPS546_get_iout() * 1000;
                 power_management->power = (TPS546_get_vout() * power_management->current) / 1000 + HEX_POWER_OFFSET;
                 break;
             case DEVICE_GAMMA:
+                TPS546_print_status();
                 power_management->voltage = TPS546_get_vin() * 1000;
                 power_management->current = TPS546_get_iout() * 1000;
                 power_management->power = (TPS546_get_vout() * power_management->current) / 1000 + GAMMA_POWER_OFFSET;
@@ -240,10 +242,11 @@ void POWER_MANAGEMENT_task(void * pvParameters)
                 case DEVICE_SUPRA:
                 case DEVICE_GAMMA:
                     double chipMaxTemp = BOARD_MAX_TEMP;   //Chip throttle temp; 
-					if ((GLOBAL_STATE->board_version <= 402&&GLOBAL_STATE->board_version <= 499)
-                            ||(GLOBAL_STATE->board_version <= 600||GLOBAL_STATE->board_version <= 699)) {
+					if ((GLOBAL_STATE->board_version >= 402&&GLOBAL_STATE->board_version <= 499)
+                            ||(GLOBAL_STATE->board_version >= 600 && GLOBAL_STATE->board_version <= 699)) {
                         power_management->chip_temp_avg = GLOBAL_STATE->asic_ready?EMC2101_get_external_temp():0;
 						power_management->vr_temp = (float)TPS546_get_temperature();
+                        ESP_LOGE(TAG,"SKDJLFSLKDFJ %d",GLOBAL_STATE->board_version );
                         chipMaxTemp = CHIP_MAX_TEMP;
 					} else {
                         power_management->chip_temp_avg = EMC2101_get_internal_temp() + 5;
