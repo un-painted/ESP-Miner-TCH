@@ -140,6 +140,9 @@ void SYSTEM_init_peripherals(GlobalState * GLOBAL_STATE) {
         case DEVICE_ULTRA:
         case DEVICE_SUPRA:
         case DEVICE_GAMMA:
+        case DEVICE_HEX:
+        case DEVICE_SUPRAHEX:
+        case DEVICE_GAMMAHEX:
             // oled
             if (!OLED_init()) {
                 ESP_LOGI(TAG, "OLED init failed!");
@@ -341,6 +344,9 @@ static void _show_overheat_screen(GlobalState * GLOBAL_STATE)
         case DEVICE_ULTRA:
         case DEVICE_SUPRA:
         case DEVICE_GAMMA:
+        case DEVICE_HEX:
+        case DEVICE_SUPRAHEX:
+        case DEVICE_GAMMAHEX:
             if (OLED_status()) {
                 OLED_clearLine(0);
                 OLED_writeString(0, 0, "DEVICE OVERHEAT!");
@@ -371,6 +377,9 @@ static void _update_screen_one(GlobalState * GLOBAL_STATE)
         case DEVICE_ULTRA:
         case DEVICE_SUPRA:
         case DEVICE_GAMMA:
+        case DEVICE_HEX:
+        case DEVICE_SUPRAHEX:
+        case DEVICE_GAMMAHEX:
             if (OLED_status()) {
                 float efficiency = GLOBAL_STATE->POWER_MANAGEMENT_MODULE.power / (module->current_hashrate / 1000.0);
 
@@ -406,6 +415,9 @@ static void _update_screen_two(GlobalState * GLOBAL_STATE)
         case DEVICE_ULTRA:
         case DEVICE_SUPRA:
         case DEVICE_GAMMA:
+        case DEVICE_HEX:
+        case DEVICE_SUPRAHEX:
+        case DEVICE_GAMMAHEX:
             if (OLED_status()) {
                 // Pool URL
                 OLED_writeString(0, 0, "Mining URL:");
@@ -448,6 +460,9 @@ static void _clear_display(GlobalState * GLOBAL_STATE)
         case DEVICE_ULTRA:
         case DEVICE_SUPRA:
         case DEVICE_GAMMA:
+        case DEVICE_HEX:
+        case DEVICE_SUPRAHEX:
+        case DEVICE_GAMMAHEX:
             OLED_clearLine(0);
             OLED_clearLine(1);
             OLED_clearLine(2);
@@ -466,6 +481,9 @@ static void _init_connection(GlobalState * GLOBAL_STATE)
         case DEVICE_ULTRA:
         case DEVICE_SUPRA:
         case DEVICE_GAMMA:
+        case DEVICE_HEX:
+        case DEVICE_SUPRAHEX:
+        case DEVICE_GAMMAHEX:
             if (OLED_status()) {
                 memset(module->oled_buf, 0, 20);
                 snprintf(module->oled_buf, 20, "Connecting to SSID:");
@@ -485,6 +503,9 @@ static void _update_connection(GlobalState * GLOBAL_STATE)
         case DEVICE_ULTRA:
         case DEVICE_SUPRA:
         case DEVICE_GAMMA:
+        case DEVICE_HEX:
+        case DEVICE_SUPRAHEX:
+        case DEVICE_GAMMAHEX:
             if (OLED_status()) {
                 OLED_clearLine(2);
                 strncpy(module->oled_buf, module->ssid, sizeof(module->oled_buf));
@@ -514,6 +535,9 @@ static void show_ap_information(const char * error, GlobalState * GLOBAL_STATE)
         case DEVICE_ULTRA:
         case DEVICE_SUPRA:
         case DEVICE_GAMMA:
+        case DEVICE_HEX:
+        case DEVICE_SUPRAHEX:
+        case DEVICE_GAMMAHEX:
             if (OLED_status()) {
                 _clear_display(GLOBAL_STATE);
                 if (error != NULL) {
