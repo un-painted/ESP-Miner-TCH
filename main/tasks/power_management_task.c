@@ -246,7 +246,6 @@ void POWER_MANAGEMENT_task(void * pvParameters)
                             ||(GLOBAL_STATE->board_version >= 600 && GLOBAL_STATE->board_version <= 699)) {
                         power_management->chip_temp_avg = GLOBAL_STATE->asic_ready?EMC2101_get_external_temp():0;
 						power_management->vr_temp = (float)TPS546_get_temperature();
-                        ESP_LOGE(TAG,"SKDJLFSLKDFJ %d",GLOBAL_STATE->board_version );
                         chipMaxTemp = CHIP_MAX_TEMP;
 					} else {
                         power_management->chip_temp_avg = EMC2101_get_internal_temp() + 5;
