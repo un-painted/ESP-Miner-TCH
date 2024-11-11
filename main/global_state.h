@@ -25,13 +25,7 @@
 typedef enum
 {
     DEVICE_UNKNOWN = -1,
-    DEVICE_MAX,
-    DEVICE_ULTRA,
-    DEVICE_SUPRA,
-    DEVICE_HEX,
-    DEVICE_SUPRAHEX,
-    DEVICE_GAMMA,
-    DEVICE_GAMMAHEX,
+    DEVICE_ZYBER_OCTO,
 } DeviceModel;
 
 typedef enum

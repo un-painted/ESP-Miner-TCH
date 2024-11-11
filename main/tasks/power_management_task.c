@@ -1,7 +1,5 @@
-#include "EMC2101.h"
 #include "EMC2302.h"
 #include "INA260.h"
-#include "bm1397.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
