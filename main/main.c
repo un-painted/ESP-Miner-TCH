@@ -19,7 +19,6 @@
 #include "i2c_bitaxe.h"
 #include "adc.h"
 #include "nvs_device.h"
-#include "self_test.h"
 
 static GlobalState GLOBAL_STATE = {.extranonce_str = NULL, .extranonce_2_len = 0, .abandon_work = 0, .version_mask = 0};
 
@@ -45,17 +44,10 @@ void app_main(void)
         return;
     }
     
-    
     //parse the NVS config into GLOBAL_STATE
     if (NVSDevice_parse_config(&GLOBAL_STATE) != ESP_OK) {
         ESP_LOGE(TAG, "Failed to parse NVS config");
         return;
-    }
-
-    //should we run the self test?
-    if (should_test(&GLOBAL_STATE)) {
-        self_test((void *) &GLOBAL_STATE);
-        vTaskDelay(60 * 60 * 1000 / portTICK_PERIOD_MS);
     }
 
     SYSTEM_init_system(&GLOBAL_STATE);

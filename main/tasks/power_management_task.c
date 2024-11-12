@@ -1,5 +1,4 @@
 #include "EMC2302.h"
-#include "INA260.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -15,17 +14,14 @@
 //#include "max6689.h"
 
 #define POLL_RATE 2000
-#define BOARD_MAX_TEMP 90.0
-#define BOARD_THROTTLE_TEMP 75.0
 
-#define TPS546_THROTTLE_TEMP 105.0
+#define BOARD_MAX_TEMP 98.0
+#define BOARD_THROTTLE_TEMP 90.0
+
+#define TPS546_THROTTLE_TEMP 115.0
 #define TPS546_MAX_TEMP 135.0
 
-#define CHIP_THROTTLE_TEMP 85.0
-#define CHIP_MAX_TEMP 95.0
-
-#define HEX_POWER_OFFSET 16
-#define GAMMA_POWER_OFFSET 5
+#define ZYBER_POWER_OFFSET 15
 
 static const char * TAG = "power_management";
 
