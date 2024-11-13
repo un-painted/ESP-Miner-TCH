@@ -38,24 +38,13 @@ static const char * TAG = "power_management";
 // Set the fan speed between 45% min and 100% max based on chip temperature as input.
 // The fan speed increases from 45% to 100% proportionally to the temperature increase from 50 and THROTTLE_TEMP
 // For Hex, we take account on the TPS546 temp as well. Fan speed is depends on the higher temp device.
-static double automatic_fan_speed(float chip_temp, float vr_temp, GlobalState * GLOBAL_STATE)
+static double automatic_fan_speed(float temp, GlobalState * GLOBAL_STATE)
 {
     double result = 0.0;
     double resultTps = 0.0;
     double min_temp = 45.0;
     double min_fan_speed = 45.0;
-    double throttleTemp = BOARD_THROTTLE_TEMP;   //Chip throttle temp;
 
-    switch (GLOBAL_STATE->device_model)
-    {
-    case DEVICE_SUPRAHEX:
-    case DEVICE_GAMMAHEX:
-    case DEVICE_GAMMA:
-        throttleTemp = CHIP_THROTTLE_TEMP;
-        break;
-    default:
-        break;
-    }
 
     if (chip_temp < min_temp) {
         result = min_fan_speed;
