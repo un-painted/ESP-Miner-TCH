@@ -25,15 +25,6 @@
 
 static const char * TAG = "power_management";
 
-// static float _fbound(float value, float lower_bound, float upper_bound)
-// {
-//     if (value < lower_bound)
-//         return lower_bound;
-//     if (value > upper_bound)
-//         return upper_bound;
-
-//     return value;
-// }
 
 // Set the fan speed between 45% min and 100% max based on chip temperature as input.
 // The fan speed increases from 45% to 100% proportionally to the temperature increase from 50 and THROTTLE_TEMP
@@ -46,55 +37,23 @@ static double automatic_fan_speed(float temp, GlobalState * GLOBAL_STATE)
     double min_fan_speed = 45.0;
 
 
-    if (chip_temp < min_temp) {
+    if (temp < min_temp) {
         result = min_fan_speed;
-    } else if (chip_temp >= throttleTemp) {
+    } else if (chip_temp >= BOARD_THROTTLE_TEMP) {
         result = 100;
     } else {
-        double temp_range = throttleTemp - min_temp;
+        double temp_range = BOARD_THROTTLE_TEMP - min_temp;
         double fan_range = 100 - min_fan_speed;
-        result = ((chip_temp - min_temp) / temp_range) * fan_range + min_fan_speed;
+        result = ((temp - min_temp) / temp_range) * fan_range + min_fan_speed;
     }
 
     float perc = (float) result / 100;
 
-    if(GLOBAL_STATE->device_model==DEVICE_HEX||GLOBAL_STATE->device_model==DEVICE_SUPRAHEX){
-        if (vr_temp < min_temp) {
-            resultTps = min_fan_speed;
-        } else if (vr_temp >= TPS546_THROTTLE_TEMP) {
-            resultTps = 100;
-        } else {
-            double temp_range = TPS546_THROTTLE_TEMP - min_temp;
-            double fan_range = 100 - min_fan_speed;
-            resultTps = ((vr_temp - min_temp) / temp_range) * fan_range + min_fan_speed;
-        }
-        if(resultTps>result){
-            result = resultTps;
-            perc = (float) resultTps / 100;
-        }
-    }
-
-    //We calculate the highest perc for cooling
-
     
     GLOBAL_STATE->POWER_MANAGEMENT_MODULE.fan_perc = perc;
     //ESP_LOGI(TAG, "AutoFan speed set to: %f percent", perc*100);
-
-    switch (GLOBAL_STATE->device_model) {
-        case DEVICE_MAX:
-        case DEVICE_ULTRA:
-        case DEVICE_SUPRA:
-        case DEVICE_GAMMA:
-            EMC2101_set_fan_speed( perc );
-            break;
-        case DEVICE_HEX:
-        case DEVICE_SUPRAHEX:
-        case DEVICE_GAMMAHEX:
-            EMC2302_set_fan_speed(0,perc);
-            EMC2302_set_fan_speed(1,perc);
-            break;
-        default:
-    }
+    EMC2302_set_fan_speed(0,perc);
+    EMC2302_set_fan_speed(1,perc);
 	return result;
 }
 
@@ -106,58 +65,25 @@ void POWER_MANAGEMENT_task(void * pvParameters)
 
     power_management->frequency_multiplier = 1;
 
-    power_management->HAS_POWER_EN = GLOBAL_STATE->board_version == 202 || GLOBAL_STATE->board_version == 203 || GLOBAL_STATE->board_version == 204;
-    power_management->HAS_PLUG_SENSE = GLOBAL_STATE->board_version == 204;
+    //TODO: delete later
+    power_management->HAS_POWER_EN = false;
+    power_management->HAS_PLUG_SENSE = false;
 
-    //int last_frequency_increase = 0;
+    uint16_t auto_fan_speed = 1;
 
-    //uint16_t frequency_target = nvs_config_get_u16(NVS_CONFIG_ASIC_FREQ, CONFIG_ASIC_FREQUENCY);
-
-    uint16_t auto_fan_speed = nvs_config_get_u16(NVS_CONFIG_AUTO_FAN_SPEED, 1);
-
-    float power_offset = 0;
-
-    TPS546_CONFIG tpsConfig = DEFAULT_CONFIG;
-
-    switch (GLOBAL_STATE->device_model) {
-        case DEVICE_MAX:
-        case DEVICE_ULTRA:
-        case DEVICE_SUPRA:
-			if (GLOBAL_STATE->board_version < 402 || GLOBAL_STATE->board_version > 499) {
-                // Configure GPIO12 as input(barrel jack) 1 is plugged in
-                gpio_config_t barrel_jack_conf = {
-                    .pin_bit_mask = (1ULL << GPIO_NUM_12),
-                    .mode = GPIO_MODE_INPUT,
-                };
-                gpio_config(&barrel_jack_conf);
-                int barrel_jack_plugged_in = gpio_get_level(GPIO_NUM_12);
-
-                gpio_set_direction(GPIO_NUM_10, GPIO_MODE_OUTPUT);
-                if (barrel_jack_plugged_in == 1 || !power_management->HAS_PLUG_SENSE) {
-                    // turn ASIC on
-                    gpio_set_level(GPIO_NUM_10, 0);
-                } else {
-                    // turn ASIC off
-                    gpio_set_level(GPIO_NUM_10, 1);
-                }
-			}
-            break;
-        case DEVICE_GAMMA:
-            break;
-        case DEVICE_HEX:
-        case DEVICE_SUPRAHEX:
-        case DEVICE_GAMMAHEX:
-            //max6689_init();
-            TMP1075_init();
-            EMC2302_init(true);
-            break;
-        default:
-    }
+    //float power_offset = 0;
+    TMP1075_init();
+    EMC2302_init(true);
 
     vTaskDelay(500 / portTICK_PERIOD_MS);
 
     while (1) {
         auto_fan_speed = nvs_config_get_u16(NVS_CONFIG_AUTO_FAN_SPEED, 1);
+        TPS546_print_status();
+        power_management->voltage = TPS546_get_vin() * 1000;
+        power_management->current = TPS546_get_iout() * 1000;
+        
+
         switch (GLOBAL_STATE->device_model) {
             case DEVICE_MAX:
             case DEVICE_ULTRA:
