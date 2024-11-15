@@ -4,10 +4,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "asic_task.h"
-#include "bm1370.h"
 #include "bm1368.h"
 #include "bm1366.h"
-#include "bm1397.h"
 #include "bm1370.h"
 #include "common.h"
 #include "power_management_task.h"
@@ -31,7 +29,6 @@ typedef enum
 typedef enum
 {
     ASIC_UNKNOWN = -1,
-    ASIC_BM1397,
     ASIC_BM1366,
     ASIC_BM1368,
     ASIC_BM1370,
@@ -93,7 +90,6 @@ typedef struct
     work_queue stratum_queue;
     work_queue ASIC_jobs_queue;
 
-    bm1397Module BM1397_MODULE;
     SystemModule SYSTEM_MODULE;
     AsicTaskModule ASIC_TASK_MODULE;
     PowerManagementModule POWER_MANAGEMENT_MODULE;

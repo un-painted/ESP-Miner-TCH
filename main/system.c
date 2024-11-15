@@ -105,21 +105,7 @@ void SYSTEM_init_peripherals(GlobalState * GLOBAL_STATE) {
         ESP_LOGE(TAG, "Failed to ensure overheat_mode config");
     }
 
-    //Init the OLED
-    switch (GLOBAL_STATE->device_model) {
-        // TODO: swtich to init the 1.91 inch TFT screen
-        case DEVICE_ZYBER_OCTO:
-            // oled
-            if (!OLED_init()) {
-                ESP_LOGI(TAG, "OLED init failed!");
-            } else {
-                ESP_LOGI(TAG, "OLED init success!");
-                // clear the oled screen
-                OLED_fill(0);
-            }
-            break;
-        default:
-    }
+    //TODO: Init TFT Screen
 
     netif = esp_netif_get_handle_from_ifkey("WIFI_STA_DEF");
 
@@ -390,7 +376,7 @@ static void _init_connection(GlobalState * GLOBAL_STATE)
 
     //TODO:
 
-    switch (GLOBAL_STATE->device_model) {
+    //switch (GLOBAL_STATE->device_model) {
         // case DEVICE_MAX:
         // case DEVICE_ULTRA:
         // case DEVICE_SUPRA:
@@ -405,7 +391,7 @@ static void _init_connection(GlobalState * GLOBAL_STATE)
         //     }
         //     break;
         // default:
-    }
+    //}
 }
 
 static void _update_connection(GlobalState * GLOBAL_STATE)

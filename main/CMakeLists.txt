@@ -26,7 +26,6 @@ INCLUDE_DIRS
     "."
     "tasks"
     "http_server"
-    "self_test"
     "../components/asic/include"
     "../components/connect/include"
     "../components/dns_server/include"
