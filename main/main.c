@@ -28,6 +28,7 @@ static const char * TAG = "bitaxe";
 void app_main(void)
 {
     ESP_LOGI(TAG, "Welcome to the bitaxe - hack the planet!");
+    ESP_LOGI(TAG, "Firmare Version: 2.3.3-TCH-All-In-One");
 
     // Init I2C
     ESP_ERROR_CHECK(i2c_bitaxe_init());

@@ -107,7 +107,7 @@ static void _send_simple(uint8_t * data, uint8_t total_length)
 {
     unsigned char * buf = malloc(total_length);
     memcpy(buf, data, total_length);
-    SERIAL_send(buf, total_length, false);
+    SERIAL_send(buf, total_length, BM1370_SERIALTX_DEBUG);
 
     free(buf);
 }
@@ -117,7 +117,7 @@ static void _send_chain_inactive(void)
 
     unsigned char read_address[2] = {0x00, 0x00};
     // send serial data
-    _send_BM1370((TYPE_CMD | GROUP_ALL | CMD_INACTIVE), read_address, 2, false);
+    _send_BM1370((TYPE_CMD | GROUP_ALL | CMD_INACTIVE), read_address, 2, BM1370_SERIALTX_DEBUG);
 }
 
 static void _set_chip_address(uint8_t chipAddr)
@@ -125,7 +125,7 @@ static void _set_chip_address(uint8_t chipAddr)
 
     unsigned char read_address[2] = {chipAddr, 0x00};
     // send serial data
-    _send_BM1370((TYPE_CMD | GROUP_SINGLE | CMD_SETADDRESS), read_address, 2, false);
+    _send_BM1370((TYPE_CMD | GROUP_SINGLE | CMD_SETADDRESS), read_address, 2, BM1370_SERIALTX_DEBUG);
 }
 
 void BM1370_set_version_mask(uint32_t version_mask) 
@@ -298,7 +298,7 @@ static void do_frequency_ramp_up() {
         freq_cmd[3] = freq_list[i][1];
         freq_cmd[4] = freq_list[i][2];
         freq_cmd[5] = freq_list[i][3];
-        _send_BM1370((TYPE_CMD | GROUP_ALL | CMD_WRITE), freq_cmd, 6, false);
+        _send_BM1370((TYPE_CMD | GROUP_ALL | CMD_WRITE), freq_cmd, 6, BM1370_SERIALTX_DEBUG);
         vTaskDelay(100 / portTICK_PERIOD_MS);
     }
 }
@@ -385,9 +385,9 @@ static uint8_t _send_init(uint64_t frequency, uint16_t asic_count)
     // _send_simple(init11, 11);
     BM1370_set_job_difficulty_mask(BM1370_ASIC_DIFFICULTY);
 
-    //Analog Mux Control
-    unsigned char init12[11] = {0x55, 0xAA, 0x51, 0x09, 0x00, 0x54, 0x00, 0x00, 0x00, 0x03, 0x1D};
-    _send_simple(init12, 11);
+    //Analog Mux Control -- not sent on S21 Pro?
+    // unsigned char init12[11] = {0x55, 0xAA, 0x51, 0x09, 0x00, 0x54, 0x00, 0x00, 0x00, 0x03, 0x1D};
+    // _send_simple(init12, 11);
 
     //Set the IO Driver Strength on chip 00
     //**TX: 55 AA 51 09 00 58 00 01 11 11 0D  //command all chips, write chip address 00, register 58, data 01 11 11 11 - Set the IO Driver Strength on chip 00
@@ -413,6 +413,16 @@ static uint8_t _send_init(uint64_t frequency, uint16_t asic_count)
         unsigned char set_3c_register_third[6] = {i * address_interval, 0x3C, 0x80, 0x00, 0x82, 0xAA};
         _send_BM1370((TYPE_CMD | GROUP_SINGLE | CMD_WRITE), set_3c_register_third, 6, false);
     }
+
+    //Some misc settings?
+    // TX: 55 AA 51 09 [00 B9 00 00 44 80] 0D    //command all chips, write chip address 00, register B9, data 00 00 44 80
+    _send_BM1370((TYPE_CMD | GROUP_ALL | CMD_WRITE), (uint8_t[]){0x00, 0xB9, 0x00, 0x00, 0x44, 0x80}, 6, BM1370_SERIALTX_DEBUG);
+    // TX: 55 AA 51 09 [00 54 00 00 00 02] 18    //command all chips, write chip address 00, register 54, data 00 00 00 02 - Analog Mux Control - rumored to control the temp diode
+    _send_BM1370((TYPE_CMD | GROUP_ALL | CMD_WRITE), (uint8_t[]){0x00, 0x54, 0x00, 0x00, 0x00, 0x02}, 6, BM1370_SERIALTX_DEBUG);
+    // TX: 55 AA 51 09 [00 B9 00 00 44 80] 0D    //command all chips, write chip address 00, register B9, data 00 00 44 80 -- duplicate of first command in series
+    _send_BM1370((TYPE_CMD | GROUP_ALL | CMD_WRITE), (uint8_t[]){0x00, 0xB9, 0x00, 0x00, 0x44, 0x80}, 6, BM1370_SERIALTX_DEBUG);
+    // TX: 55 AA 51 09 [00 3C 80 00 8D EE] 1B    //command all chips, write chip address 00, register 3C, data 80 00 8D EE
+    _send_BM1370((TYPE_CMD | GROUP_ALL | CMD_WRITE), (uint8_t[]){0x00, 0x3C, 0x80, 0x00, 0x8D, 0xEE}, 6, BM1370_SERIALTX_DEBUG);
 
     do_frequency_ramp_up();
 
