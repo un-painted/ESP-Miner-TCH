@@ -64,6 +64,12 @@ esp_err_t NVSDevice_parse_config(GlobalState * GLOBAL_STATE) {
         GLOBAL_STATE->asic_count = 6;
         GLOBAL_STATE->voltage_domain = 3;
         GLOBAL_STATE->has_chip_temp = false;
+    }else if (strcmp(GLOBAL_STATE->device_model_str, "lv07") == 0) {
+        ESP_LOGI(TAG, "DEVICE: LV07");
+        GLOBAL_STATE->device_model = DEVICE_HEX;
+        GLOBAL_STATE->asic_count = 2;
+        GLOBAL_STATE->voltage_domain = 1;
+        GLOBAL_STATE->has_chip_temp = false;
     }else if (strcmp(GLOBAL_STATE->device_model_str, "suprahex") == 0) {
         ESP_LOGI(TAG, "DEVICE: SupraHex");
         GLOBAL_STATE->device_model = DEVICE_SUPRAHEX;
