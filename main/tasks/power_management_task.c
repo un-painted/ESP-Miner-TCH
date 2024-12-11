@@ -26,7 +26,7 @@
 #define CHIP_THROTTLE_TEMP 85.0
 #define CHIP_MAX_TEMP 95.0
 
-#define HEX_POWER_OFFSET 16
+#define HEX_POWER_OFFSET 6
 #define GAMMA_POWER_OFFSET 5
 
 static const char * TAG = "power_management";
