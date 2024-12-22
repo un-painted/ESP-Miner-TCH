@@ -176,6 +176,9 @@ export class HomeComponent {
         } else if (info.stratumURL.includes('solo.d-central.tech')) {
           const address = info.stratumUser.split('.')[0]
           return `https://solo.d-central.tech/#/app/${address}`;
+        } else if (/eusolo[46]?.ckpool.org/.test(info.stratumURL)) {
+          const address = info.stratumUser.split('.')[0]
+          return `https://eusolostats.ckpool.org/users/${address}`;
         } else if (/solo[46]?.ckpool.org/.test(info.stratumURL)) {
           const address = info.stratumUser.split('.')[0]
           return `https://solostats.ckpool.org/users/${address}`;
