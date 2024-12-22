@@ -29,7 +29,7 @@
 static const char * TAG = "stratum_task";
 
 static StratumApiV1Message stratum_api_v1_message = {};
-static SystemTaskModule SYSTEM_TASK_MODULE = {.stratum_difficulty = 8192};
+static SystemTaskModule SYSTEM_TASK_MODULE = {.stratum_difficulty = 1024};
 
 static const char * primary_stratum_url;
 static uint16_t primary_stratum_port;
